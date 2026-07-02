@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: rdbms
+type: Opaque
+stringData:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  AIRFLOW_DB: airflow
+  AIRFLOW_USER: airflow
+  AIRFLOW_PASSWORD: airflow
+  HIVE_DB: hive
+  HIVE_USER: hive
+  HIVE_PASSWORD: hive
+  RANGER_DB: ranger
+  RANGER_USER: ranger
+  RANGER_PASSWORD: ranger
+  LLDAP_DB: lldap
+  LLDAP_USER: lldap
+  LLDAP_PASSWORD: lldap
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-initiate-command
+  namespace: rdbms
+data:
+  initiate_db.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    create_user_and_db() {
+      local database="$1"
+      local username="$2"
+      local password="$3"
+
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+        DO \$\$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT FROM pg_catalog.pg_roles WHERE rolname = '$username'
+          ) THEN
+            CREATE ROLE $username LOGIN PASSWORD '$password';
+          END IF;
+        END
+        \$\$;
+
+        SELECT 'CREATE DATABASE $database OWNER $username'
+        WHERE NOT EXISTS (
+          SELECT FROM pg_database WHERE datname = '$database'
+        )\gexec
+
+        GRANT ALL PRIVILEGES ON DATABASE $database TO $username;
+    EOSQL
+    }
+
+    create_user_and_db "$AIRFLOW_DB" "$AIRFLOW_USER" "$AIRFLOW_PASSWORD"
+    create_user_and_db "$HIVE_DB" "$HIVE_USER" "$HIVE_PASSWORD"
+    create_user_and_db "$RANGER_DB" "$RANGER_USER" "$RANGER_PASSWORD"
+    create_user_and_db "$LLDAP_DB" "$LLDAP_USER" "$LLDAP_PASSWORD"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: rdbms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: rdbms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:18
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql
+            - name: postgres-initiate-command
+              mountPath: /docker-entrypoint-initdb.d/initiate_db.sh
+              subPath: initiate_db.sh
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: postgres-initiate-command
+          configMap:
+            name: postgres-initiate-command
+            defaultMode: 0755
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: rdbms
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

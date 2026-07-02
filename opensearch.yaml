@@ -1,0 +1,13 @@
+---
+# Dipakai bersama oleh master, data, dan coordinator
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-cluster-config
+  labels:
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/part-of: opensearch-cluster
+data:
+  opensearch.yml: |
+    cluster.name: opensearch-cluster
+    network.host: 0.0.0.0
