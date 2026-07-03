@@ -1,2 +1,0 @@
-1. .setupDone disimpan di PVC
-2. bisa pakai opensearch sebagai audit backend. pakai argumen elasticsearch
