@@ -1,0 +1,343 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-api-server
+  namespace: airflow
+data:
+  AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
+  AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: minio
+  AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: s3://airflow-logs
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-api-server
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-api-server
+  template:
+    metadata:
+      labels:
+        app: airflow-api-server
+    spec:
+      serviceAccountName: airflow
+      containers:
+        - name: api-server
+          image: apache/airflow:3.2.2-python3.14-fab-s3
+          # imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-api-server
+            - secretRef:
+                name: airflow-secret
+          command:
+            - airflow
+          args:
+            - api-server
+          ports:
+            - containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /api/v2/version
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/v2/version
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /api/v2/version
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-api-server
+  namespace: airflow
+spec:
+  selector:
+    app: airflow-api-server
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-scheduler
+  namespace: airflow
+data:
+  AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
+  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: /opt/airflow/pod_templates/pod_template_file.yaml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-scheduler
+  template:
+    metadata:
+      labels:
+        app: airflow-scheduler
+    spec:
+      serviceAccountName: airflow
+      containers:
+        - name: scheduler
+          image: apache/airflow:3.2.2-python3.14-fab
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-scheduler
+            - secretRef:
+                name: airflow-secret
+          command:
+            - airflow
+          args:
+            - scheduler
+          ports:
+            - containerPort: 8974
+          startupProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - airflow jobs check --job-type SchedulerJob --hostname "$HOSTNAME"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - airflow jobs check --job-type SchedulerJob --hostname "$HOSTNAME"
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          volumeMounts:
+            - name: pod-template
+              mountPath: /opt/airflow/pod_templates
+      volumes:
+        - name: pod-template
+          configMap:
+            name: airflow-worker-pod-template
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-scheduler
+  namespace: airflow
+spec:
+  selector:
+    app: airflow-scheduler
+  ports:
+    - name: health
+      port: 8974
+      targetPort: 8974
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-dag-processor
+  namespace: airflow
+data:
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-dag-processor
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-dag-processor
+  template:
+    metadata:
+      labels:
+        app: airflow-dag-processor
+    spec:
+      serviceAccountName: airflow
+      containers:
+        - name: dag-processor
+          image: apache/airflow:3.2.2-python3.14-fab
+          # imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-dag-processor
+            - secretRef:
+                name: airflow-secret
+          command:
+            - airflow
+          args:
+            - dag-processor
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+        - name: git-sync
+          image: registry.k8s.io/git-sync/git-sync:v4.3.0
+          env:
+            - name: GIT_SYNC_REPO
+              value: "https://github.com/willyyeremi22/airflow-dag.git"
+            - name: GIT_SYNC_BRANCH
+              value: "prod"
+            - name: GIT_SYNC_ROOT
+              value: "/opt/airflow"
+            - name: GIT_SYNC_DEST
+              value: "dags"
+            - name: GIT_SYNC_PERIOD
+              value: "60s"
+            - name: GIT_SYNC_ONE_TIME
+              value: "false"
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: dags
+          emptyDir: {}
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-triggerer
+  namespace: airflow
+data:
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-triggerer
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-triggerer
+  template:
+    metadata:
+      labels:
+        app: airflow-triggerer
+    spec:
+      serviceAccountName: airflow
+      containers:
+        - name: triggerer
+          image: apache/airflow:3.2.2-python3.14-fab
+          # imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-triggerer
+            - secretRef:
+                name: airflow-secret
+          command:
+            - airflow
+          args:
+            - triggerer
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+        - name: git-sync
+          image: registry.k8s.io/git-sync/git-sync:v4.3.0
+          env:
+            - name: GIT_SYNC_REPO
+              value: "https://github.com/willyyeremi22/airflow-dag.git"
+            - name: GIT_SYNC_BRANCH
+              value: "prod"
+            - name: GIT_SYNC_ROOT
+              value: "/opt/airflow"
+            - name: GIT_SYNC_DEST
+              value: "dags"
+            - name: GIT_SYNC_PERIOD
+              value: "60s"
+            - name: GIT_SYNC_ONE_TIME
+              value: "false"
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: dags
+          emptyDir: {}
+

@@ -1,0 +1,710 @@
+################################################
+# Configuration and system settings
+
+---
+# Cluster and node identity settings
+# These are the fundamental settings required to identify your cluster and nodes:
+
+# The cluster name. Default is opensearch. (Static, string)
+cluster.name:
+# A descriptive name for the node. Required. (Static, string)
+node.name:
+# Defines one or more roles for an OpenSearch node. Valid values are cluster_manager, data, ingest, search, ml, remote_cluster_client, and coordinating_only. Default is cluster_manager,data,ingest,remote_cluster_client.  (Static, list)
+node.roles:
+# Provides a seed value for determining the persisted unique UUID of a node. When a node starts for the first time, this seed helps generate a unique node identifier. If the node already has a persisted UUID on disk from a previous startup, this seed is ignored and the existing UUID is reused. This setting is useful for ensuring consistent node identification in automated deployments. Default is 0. Accepts any long value including negative numbers. (Static, long)
+node.id.seed:
+
+---
+# Path settings
+# Path settings define directory locations for OpenSearch installation and data storage:
+
+# Specifies the home directory path for the OpenSearch installation. This is the root directory where OpenSearch is installed and contains the bin, config, lib, and other installation directories. This setting is typically set automatically during installation but can be explicitly configured if needed. No default value - must be specified during startup. (Static, string)
+path.home:
+# A path to the directory where your data is stored. Separate multiple locations with commas. Default is $OPENSEARCH_HOME/data. (Static, string)
+path.data:
+# A path to log files. Default is $OPENSEARCH_HOME/logs. (Static, string)
+path.logs:
+# Specifies the path to a shared data directory that can be accessed by multiple nodes. This setting is useful in multi-node deployments where certain data needs to be shared across nodes in the cluster. The specified directory must be accessible by all nodes that need to share data. No default value - only set when shared data functionality is required. (Static, string)
+path.shared_data:
+
+---
+# Memory and storage settings
+# Settings that control how OpenSearch uses system memory and storage:
+
+# Locks the memory at startup. We recommend setting the heap size to about half the memory available on the system and that the owner of the process be allowed to use this limit. OpenSearch doesn’t perform well when the system is swapping the memory. Default is false. (Static, Boolean)
+bootstrap.memory_lock:
+# Controls whether memory-mapped file access is allowed for index storage operations. When enabled, OpenSearch can use memory mapping (mmapfs and hybridfs store types) to improve I/O performance by mapping files directly into virtual memory. Disabling this setting forces the use of alternative storage implementations that don’t require memory mapping, which may be necessary in environments with memory mapping restrictions or limited virtual address space. Default is true. (Static, Boolean)
+node.store.allow_mmap:
+# Controls whether the node can store data locally on its file system. When enabled, the node can write index data, cluster state, and other persistent information to local disk. When disabled, the node operates as a stateless node that does not persist any data locally. This setting is useful for creating dedicated coordination-only nodes that don’t store shard data. Default is true. (Static, Boolean)
+node.local_storage:
+
+---
+# Bootstrap and system security settings
+# Settings that control system-level security and bootstrap behavior:
+
+# Controls whether OpenSearch enables system call filters (seccomp) for enhanced security. When enabled, the system call filter prevents certain potentially dangerous system calls from being executed, providing an additional layer of security. If system call filters cannot be installed due to system configuration issues, this setting can be set to false to disable them, but this reduces security. Default is true. (Static, Boolean)
+bootstrap.system_call_filter:
+# Controls whether OpenSearch enables a control handler for graceful shutdown on Windows systems. When enabled, allows OpenSearch to respond to system shutdown signals and perform cleanup operations. This setting is primarily relevant for Windows deployments and helps ensure proper shutdown behavior. Default is true. (Static, Boolean)
+bootstrap.ctrlhandler:
+
+---
+# Process management settings
+# Settings for external monitoring and process management tools:
+# Controls whether OpenSearch writes the node’s port information to a file on disk. When enabled, the node creates a file containing the ports it’s listening on, which can be useful for external monitoring and automation tools. This file is typically written to the node’s data directory and is removed when the node shuts down cleanly. Default is false. (Static, Boolean)
+node.portsfile:
+# Specifies the path where OpenSearch should write its process ID (PID) file. The PID file contains the process ID of the running OpenSearch node and is commonly used by system administrators and process management tools to track and manage the OpenSearch process. The file is created when the node starts and removed when it shuts down cleanly. The specified path should be writable by the OpenSearch process. No default value - PID file is not created unless this setting is specified.  (Static, string)
+node.pidfile:
+################################################
+
+################################################
+# Network settings
+
+# Binds an OpenSearch node to an address. Use 0.0.0.0 to include all available network interfaces, or specify an IP address assigned to a specific interface. The network.host setting is a combination of network.bind_host and network.publish_host if they are the same value. An alternative to network.host is to configure network.bind_host and network.publish_host separately as needed. See Advanced network settings. (Static, list)
+network.host:
+# Binds an OpenSearch node to a custom port or a range of ports for HTTP communication. You can specify an address or a range of addresses. Default is 9200-9300. (Static, single value or range)
+http.port:
+# Binds an OpenSearch node to a custom port for communication between nodes. You can specify an address or a range of addresses. Default is 9300-9400. (Static, single value or range)
+transport.port:
+
+---
+# Advanced network settings
+# OpenSearch supports the following advanced network settings:
+
+# Binds an OpenSearch node to an address or addresses for incoming connections. Default is the value in network.host. (Static, list)
+network.bind_host:
+# Specifies an address or addresses that an OpenSearch node publishes to other nodes in the cluster so that they can connect to it. (Static, list)
+network.publish_host:
+
+---
+# General TCP settings
+# OpenSearch supports the following TCP settings that apply to all network connections, including both the HTTP and transport layers:
+
+# Enables or disables TCP keep-alive for all TCP connections used by OpenSearch, including the HTTP and transport layers. When enabled, the operating system will send periodic keep-alive packets to detect dead connections. Default is true. (Static, Boolean)
+network.tcp.keep_alive:
+# Enables or disables the TCP_NODELAY option for all TCP connections. When enabled, disables Nagle’s algorithm, which can reduce latency for small messages at the cost of increased network traffic. This applies to both HTTP and transport connections. Default is true. (Static, Boolean)
+network.tcp.no_delay:
+# Sets the size of the TCP receive buffer for all TCP connections used by OpenSearch. This affects both HTTP and transport connections. A larger buffer can improve throughput for high-bandwidth connections. By default, this is not explicitly set and uses the operating system default. (Static, byte unit)
+network.tcp.receive_buffer_size:
+# Controls whether TCP addresses can be reused for all TCP connections. This affects socket binding behavior for both HTTP and transport connections. Default is true on non-Windows machines and false on Windows. (Static, Boolean)
+network.tcp.reuse_address:
+# Sets the size of the TCP send buffer for all TCP connections used by OpenSearch. This affects both HTTP and transport connections. A larger buffer can improve throughput for high-bandwidth connections. By default, this is not explicitly set and uses the operating system default. (Static, byte unit)
+network.tcp.send_buffer_size:
+# Enables network server functionality. Default is true. (Static, Boolean)
+network.server:
+# Number of TCP keep-alive probes before connection is dropped. Default is -1 (system default). Minimum is -1. (Static, integer)
+network.tcp.keep_count:
+# The amount of time, in seconds, before starting TCP keep-alive probes. Default is -1 (system default). Minimum is -1. Maximum is 300. (Static, integer)
+network.tcp.keep_idle:
+# The time interval, in seconds, between TCP keep-alive probes. Default is -1 (system default). Minimum is -1. Maximum is 300. (Static, integer)
+network.tcp.keep_interval:
+# Sets the timeout for establishing TCP connections across all network layers. This setting applies to both HTTP and transport connections and controls how long to wait for a connection to be established before timing out. Default is 30s. (Static, time unit)
+network.tcp.connect_timeout:
+
+---
+# Advanced HTTP settings
+# OpenSearch supports the following advanced network settings for HTTP communication:
+
+# Sets the address of an OpenSearch node for HTTP communication. The http.host setting is a combination of http.bind_host and http.publish_host if they are the same value. An alternative to http.host is to configure http.bind_host and http.publish_host separately as needed. (Static, list)
+http.host:
+# Specifies an address or addresses to which an OpenSearch node binds to listen for incoming HTTP connections. (Static, list)
+http.bind_host:
+# Specifies an address or addresses that an OpenSearch node publishes to other nodes for HTTP communication. (Static, list)
+http.publish_host:
+# Enables support for compression using Accept-Encoding when applicable. When HTTPS is enabled, the default is false, otherwise, the default is true. Disabling compression for HTTPS helps mitigate potential security risks, such as BREACH attacks. To enable compression for HTTPS traffic, explicitly set http.compression to true. (Static, Boolean)
+http.compression:
+# The maximum combined size of all HTTP headers allowed in a request. Default is 16KB. (Static, string)
+http.max_header_size:
+# Defines the compression level to use for HTTP responses when compression is enabled. Valid values are in the range of 1 (minimum compression) to 9 (maximum compression). Higher values provide better compression but use more CPU resources. Default is 3. (Static, integer)
+http.compression_level:
+# Sets the maximum size of HTTP chunks for request and response processing. This setting controls how HTTP messages are broken into smaller pieces for transmission. Larger chunk sizes can improve throughput for large requests but may increase memory usage. Default is 8kb. (Static, byte unit)
+http.max_chunk_size:
+# Sets the maximum content length allowed for HTTP requests. Requests exceeding this limit will be rejected. This setting helps prevent memory issues caused by extremely large requests. Default is 100mb. (Static, byte unit)
+http.max_content_length:
+# Sets the maximum length allowed for HTTP URLs in the initial request line. URLs exceeding this limit will be rejected. Default is 4kB. (Static, byte unit)
+http.max_initial_line_length:
+# Sets the maximum number of warning headers that can be included in HTTP responses to clients. Warning headers provide additional information about the request processing. Default is unbounded (no limit). (Static, integer)
+http.max_warning_header_count:
+# Sets the maximum total size of all warning headers combined in HTTP responses to clients. This helps prevent response headers from becoming too large. Default is unbounded (no limit). (Static, byte unit)
+http.max_warning_header_size:
+# Sets the maximum number of events that can be queued up in memory before an HTTP connection is closed. This setting helps manage memory usage for HTTP pipelining. Default is 10000. (Static, integer)
+http.pipelining.max_events:
+# Specifies the port that HTTP clients should use when communicating with this node. This setting is useful when a cluster node is behind a proxy or firewall and the actual http.port is not directly addressable from outside the network. Default is the actual port assigned via http.port. (Static, integer)
+http.publish_port:
+# Controls the TCP_NODELAY option for HTTP connections. When enabled, disables Nagle’s algorithm, which can reduce latency for small messages at the cost of increased network traffic. Default is true. (Static, Boolean)
+http.tcp.no_delay:
+
+---
+# HTTP CORS settings
+# OpenSearch supports the following Cross-Origin Resource Sharing (CORS) settings for HTTP:
+
+# Enables or disables CORS for HTTP requests. When enabled, OpenSearch processes CORS preflight requests and responds with appropriate Access-Control-Allow-Origin headers if the request origin is permitted. When disabled, OpenSearch ignores the Origin request header, effectively disabling CORS. Default is false. (Static, Boolean)
+http.cors.enabled:
+# Specifies which origins are allowed for CORS requests. You can use wildcards (*) to allow all origins, though this is considered to be a security risk. You can also use regular expressions by wrapping the value with forward slashes (for example, /https?:\/\/localhost(:[0-9]+)?/). Default is no origins allowed. (Static, list)
+http.cors.allow-origin:
+# Specifies which HTTP methods are allowed for CORS requests. Default is OPTIONS, HEAD, GET, POST, PUT, DELETE. (Static, list)
+http.cors.allow-methods:
+# Specifies which HTTP headers are allowed in CORS requests. Default is X-Requested-With, Content-Type, Content-Length. (Static, list)
+http.cors.allow-headers:
+# Controls whether the Access-Control-Allow-Credentials header should be included in CORS responses. This header is only returned when this setting is true. Default is false. (Static, Boolean)
+http.cors.allow-credentials:
+# Defines for how long browsers should cache the results of CORS preflight OPTIONS requests. Browsers send preflight requests to determine CORS settings before making actual cross-origin requests. Default is 1728000 seconds (20 days). (Static, time unit)
+http.cors.max-age:
+
+---
+# HTTP error handling settings
+# OpenSearch supports the following HTTP error handling settings:
+
+# Controls whether detailed error messages and stack traces are included in HTTP response output. When set to false, only simple error messages are returned unless the error_trace request parameter is specified (which will return an error when detailed errors are disabled). Default is true. (Static, Boolean)
+http.detailed_errors.enabled:
+
+---
+# HTTP debugging settings
+# OpenSearch supports the following HTTP debugging settings for tracing HTTP communication:
+
+# Specifies a comma-separated list of HTTP request paths or wildcard patterns to include in HTTP tracing. When configured, only HTTP requests matching these patterns are traced in the logs. This setting is useful for debugging specific HTTP endpoints or API calls. Default is [] (empty list, traces all requests when HTTP tracing is enabled). (Dynamic, list)
+http.tracer.include:
+# Specifies a comma-separated list of HTTP request paths or wildcard patterns to exclude from HTTP tracing. HTTP requests matching these patterns are not traced in the logs, even if HTTP tracing is enabled. This setting is useful for reducing noise from frequent or unimportant endpoints. Default is [] (empty list, no exclusions when HTTP tracing is enabled). (Dynamic, list)
+http.tracer.exclude:
+# The initial receive buffer size prediction for Netty HTTP transport. Default is 64kb. (Static, byte size)
+http.netty.receive_predictor_size:
+# The number of worker threads for Netty HTTP transport. Default is 0 (auto-detect). (Static, integer)
+http.netty.worker_count:
+# The read timeout for HTTP connections. A default of 0 means no read timeout. Default is 0. Minimum is 0. (Static, time unit)
+http.read_timeout:
+# Whether to reset cookies in HTTP responses. Disabled by default since cookies aren’t typically needed. Default is false. (Static, Boolean)
+http.reset_cookies:
+# Enables TCP keep-alive for HTTP connections. Default is true. (Static, Boolean)
+http.tcp.keep_alive:
+# The number of TCP keep-alive probes before connection is dropped. Default is system default. Minimum is -1. (Static, integer)
+http.tcp.keep_count:
+# The amount of time, in seconds, before starting TCP keep-alive probes. Default is system default. Minimum is -1. Maximum is 300. (Static, integer)
+http.tcp.keep_idle:
+# The time interval, in seconds, between TCP keep-alive probes. Default is system default. Minimum is -1. Maximum is 300. (Static, integer)
+http.tcp.keep_interval:
+# The TCP receive buffer size for HTTP connections. Default is system default. (Static, byte size)
+http.tcp.receive_buffer_size:
+# Enables TCP address reuse for HTTP connections. Default is system default. (Static, Boolean)
+http.tcp.reuse_address:
+# The TCP send buffer size for HTTP connections. Default is system default. (Static, byte size)
+http.tcp.send_buffer_size:
+
+---
+# Advanced transport settings
+# OpenSearch supports the following advanced network settings for transport communication:
+
+# Sets the address of an OpenSearch node for transport communication. The transport.host setting is a combination of transport.bind_host and transport.publish_host if they are the same value. An alternative to transport.host is to configure transport.bind_host and transport.publish_host separately as needed. (Static, list)
+transport.host:
+# Specifies an address or addresses to which an OpenSearch node binds to listen for incoming transport connections. (Static, list)
+transport.bind_host:
+# Specifies an address or addresses that an OpenSearch node publishes to other nodes for transport communication. (Static, list)
+transport.publish_host:
+# The number of boss threads for Netty transport. Default is 1. Minimum is 1. (Static, integer)
+transport.netty.boss_count:
+# The maximum receive buffer size prediction for Netty transport. Default is 64kb. (Static, byte size)
+transport.netty.receive_predictor_max:
+# The minimum receive buffer size prediction for Netty transport. Default is 64kb. (Static, byte size)
+transport.netty.receive_predictor_min:
+# The initial receive buffer size prediction for Netty transport. Default is 64kb. (Static, byte size)
+transport.netty.receive_predictor_size:
+# Enables dual-mode SSL for transport layer (both SSL and non-SSL). Default is false. (Static, Boolean)
+transport.ssl.dual_mode.enabled:
+
+---
+# Transport connection settings
+# OpenSearch supports the following transport connection settings that control the number of connections established between nodes for different types of operations:
+
+# Sets the number of connections per node dedicated to bulk operations such as bulk indexing and bulk update requests. These connections handle high-throughput data transfer operations between nodes. Higher values can improve bulk operation performance in large clusters but consume more network resources. Default is 3. Minimum is 1. (Static, integer)
+transport.connections_per_node.bulk:
+# Sets the number of connections per node used for ping operations and basic connectivity checks between nodes. Ping connections are used for cluster health monitoring and node discovery. Default is 1. Minimum is 1. (Static, integer)
+transport.connections_per_node.ping:
+# Sets the number of connections per node dedicated to shard recovery operations, including replica recovery and shard rebalancing. Recovery connections handle the transfer of shard data between nodes during recovery processes. Higher values can speed up recovery operations but may increase network load. Default is 2. Minimum is 1. (Static, integer)
+transport.connections_per_node.recovery:
+# Sets the number of regular connections per node used for general cluster operations, search requests, and administrative tasks. These are the primary connections for most inter-node communication. This setting has the highest default value as regular operations are the most common. Default is 6. Minimum is 1. (Static, integer)
+transport.connections_per_node.reg:
+# Sets the number of connections per node used for cluster state synchronization and metadata operations. State connections handle the distribution of cluster state updates, mapping changes, and other metadata operations. Default is 1. Minimum is 1. (Static, integer)
+transport.connections_per_node.state:
+
+---
+# Transport debugging settings
+# OpenSearch supports the following transport debugging settings for tracing transport communication:
+
+# Specifies a comma-separated list of transport actions or patterns to include in transport tracing. When configured, only transport communications matching these patterns are traced in the logs. This setting is useful for debugging specific internal OpenSearch operations. Default is [] (empty list, traces all actions when transport tracing is enabled). (Dynamic, list)
+transport.tracer.include:
+# Specifies a comma-separated list of transport actions or patterns to exclude from transport tracing. Transport communications matching these patterns are not traced in the logs, even if transport tracing is enabled. This setting is useful for reducing noise from frequent or unimportant operations. Default is [] (empty list, no exclusions when transport tracing is enabled). (Dynamic, list)
+transport.tracer.exclude:
+
+---
+# Transport profile settings
+# OpenSearch supports the following transport profile settings that allow configuration of multiple transport profiles for different types of connections.
+# Transport profiles allow you to bind to multiple ports on different interfaces for different types of connections. The default profile serves as a fallback for other profiles and controls how this node connects to other nodes in the cluster. The following settings can be configured for each transport profile:
+
+# Sets the port or port range to bind for this transport profile. Different profiles can use different ports to separate types of traffic. (Dynamic, single value or range)
+transport.profiles.<profile_name>.port:
+# Specifies which network interfaces this transport profile should bind to for incoming connections. Different profiles can bind to different network interfaces. (Dynamic, list)
+transport.profiles.<profile_name>.bind_host:
+# Specifies the address that this transport profile publishes to other nodes so they can connect to it. This is useful when the bind address differs from the externally accessible address. (Dynamic, list)
+transport.profiles.<profile_name>.publish_host:
+# Controls the TCP_NODELAY option for connections on this transport profile. When enabled, disables Nagle’s algorithm to reduce latency for small messages. (Dynamic, Boolean)
+transport.profiles.<profile_name>.tcp.no_delay:
+# Controls the SO_KEEPALIVE option for connections on this transport profile. When enabled, the operating system sends periodic keep-alive packets to detect dead connections. (Dynamic, Boolean)
+transport.profiles.<profile_name>.tcp.keep_alive:
+# Sets the amount of time a connection must be idle before starting to send TCP keep alive probes. Only available on Linux and Mac with JDK 11 or later. Default is -1 (uses system default). (Dynamic, time unit)
+transport.profiles.<profile_name>.tcp.keep_idle:
+# Sets the interval between TCP keep alive probes for connections on this transport profile. Only available on Linux and Mac with JDK 11 or later. Default is -1 (uses system default). (Dynamic, time unit)
+transport.profiles.<profile_name>.tcp.keep_interval:
+# Sets the number of TCP keep alive probes that can be unacknowledged before the connection is dropped. Only available on Linux and Mac with JDK 11 or later. Default is -1 (uses system default). (Dynamic, integer)
+transport.profiles.<profile_name>.tcp.keep_count:
+# Controls the SO_REUSEADDR option for sockets on this transport profile, allowing address reuse after socket closure. (Dynamic, Boolean)
+transport.profiles.<profile_name>.tcp.reuse_address:
+# Sets the TCP send buffer size for connections on this transport profile. Larger buffers can improve throughput for high-bandwidth connections. (Dynamic, byte unit)
+transport.profiles.<profile_name>.tcp.send_buffer_size:
+# Sets the TCP receive buffer size for connections on this transport profile. Larger buffers can improve throughput for high-bandwidth connections. (Dynamic, byte unit)
+transport.profiles.<profile_name>.tcp.receive_buffer_size:
+
+---
+# Advanced transport settings
+# OpenSearch supports the following advanced transport settings:
+
+# Enables DEFLATE compression for all inter-node transport communications. When enabled, data transmitted between nodes is compressed to reduce network bandwidth usage, which can be beneficial for clusters connected over slower network links. However, compression adds CPU overhead for compression and decompression operations. Default is false. (Static, Boolean)
+transport.compress:
+# Sets the timeout period for establishing new transport connections between nodes. If a connection attempt does not complete within this time limit, it is considered to be failed. This setting helps prevent nodes from hanging indefinitely when trying to connect to unresponsive or unreachable nodes. Default is 30s. (Static, time unit)
+transport.connect_timeout:
+# Configures the interval for sending application-level ping messages to maintain transport connections between nodes. When set to a positive value, nodes will send periodic ping messages to detect and prevent idle connection timeouts. Setting this to -1 disables application-level pings. It is generally recommended to use TCP keep-alive settings instead because they provide more comprehensive connection monitoring for all connection types. Default is -1 (disabled). (Static, time unit)
+transport.ping_schedule:
+# Specifies the port that other nodes should use when connecting to this node for transport communication. This setting is particularly useful when nodes are behind proxies, firewalls, or NAT configurations where the actual bind port differs from the externally accessible port. If not specified, other nodes will use the port determined by the transport.port setting. Default is the actual port assigned via transport.port. (Static, integer)
+transport.publish_port:
+
+---
+# Transport TCP settings
+# OpenSearch supports the following transport layer TCP settings that control low-level TCP behavior for inter-node communication:
+
+# Enables TCP keep-alive for transport connections between nodes. When enabled, the operating system sends periodic keep-alive packets to detect dead connections and maintain connection state. This helps detect network failures and unresponsive nodes more quickly. Default is true. (Static, Boolean)
+transport.tcp.keep_alive:
+# Sets the number of TCP keep-alive probes that can be sent without receiving a response before the connection is considered dead and closed. This setting only takes effect when TCP keep-alive is enabled. Default is -1 (uses system default). Minimum is -1. (Static, integer)
+transport.tcp.keep_count:
+# Sets the amount of time, in seconds, that a transport connection must be idle before starting to send TCP keep-alive probes. This setting controls when the keep-alive mechanism activates for idle connections. Default is -1 (uses system default). Minimum is -1. Maximum is 300. (Static, integer)
+transport.tcp.keep_idle:
+# Sets the time interval, in seconds, between TCP keep-alive probes for transport connections. Once keep-alive probes start, this setting determines how frequently they are sent. Default is -1 (uses system default). Minimum is -1. Maximum is 300. (Static, integer)
+transport.tcp.keep_interval:
+# Sets the TCP receive buffer size for transport connections. This controls how much data the operating system buffers for incoming transport messages. Larger buffers can improve throughput for high-bandwidth inter-node communication but consume more memory. Default is -1 (uses system default). (Static, byte unit)
+transport.tcp.receive_buffer_size:
+# Controls the SO_REUSEADDR socket option for transport connections. When enabled, allows the transport layer to reuse TCP addresses immediately after connection closure, which can be helpful during rapid node restarts or high connection turnover. Default depends on the operating system (typically true on non-Windows systems and false on Windows). (Static, Boolean)
+transport.tcp.reuse_address:
+# Sets the TCP send buffer size for transport connections. This controls how much data the operating system buffers for outgoing transport messages. Larger buffers can improve throughput for high-bandwidth inter-node communication but consume more memory. Default is -1 (uses system default). (Static, byte unit)
+transport.tcp.send_buffer_size:
+# Controls the TCP_NODELAY option for transport connections between nodes. When enabled, disables Nagle’s algorithm, which can reduce latency for small messages at the cost of increased network traffic. This setting is particularly important for cluster communication where low latency is critical. Default is true. (Static, Boolean)
+transport.tcp.no_delay:
+# Enables DEFLATE compression for transport layer communication between nodes. When enabled, reduces network bandwidth usage at the cost of additional CPU overhead for compression and decompression. This setting is superseded by the newer transport.compress setting. Default is false. (Static, Boolean)
+transport.tcp.compress:
+# Sets the timeout for establishing TCP connections at the transport layer between nodes. If a connection attempt does not complete within this time limit, it is considered failed. This setting is superseded by the newer transport.connect_timeout setting. Default is 30s. (Static, time unit)
+transport.tcp.connect_timeout:
+# Deprecated. Legacy setting that controls the TCP_NODELAY option for transport connections. This setting has been replaced by transport.tcp.no_delay and is maintained for backward compatibility. Use transport.tcp.no_delay instead. Default is true. (Static, Boolean)
+transport.tcp_no_delay:
+
+---
+# Transport features settings
+# OpenSearch supports the following transport features settings that control optional transport layer functionality:
+
+# Controls which transport features are enabled for inter-node communication. This is a group setting that allows enabling or disabling specific transport layer features such as compression, security enhancements, or protocol extensions. Individual feature names are appended as suffixes to configure specific transport capabilities. These settings must be configured consistently across all nodes in the cluster to ensure compatibility. (Static, group setting)
+transport.features.*:
+
+---
+# Transport and HTTP type settings
+# OpenSearch supports settings that control the default transport and HTTP implementation types used by the cluster.
+# OpenSearch supports the following static transport and HTTP type settings:
+
+# Sets the default transport implementation type for inter-node communication. This setting determines which transport implementation OpenSearch uses when no specific transport type is configured. The default implementation is netty4, which provides efficient asynchronous networking based on Netty 4. Alternative implementations can be provided by plugins. Default is netty4. (Static, string)
+transport.type.default:
+# Sets the default HTTP implementation type for client communication. This setting determines which HTTP implementation OpenSearch uses when no specific HTTP type is configured. The default implementation is netty4, which provides efficient asynchronous HTTP processing based on Netty 4. Alternative implementations like reactor-netty4 can be provided by plugins. Default is netty4.  (Static, string)
+http.type.default:
+################################################
+
+################################################
+# Discovery and gateway settings
+
+---
+# Discovery settings
+# The discovery process is used when a cluster is formed. It consists of discovering nodes and electing a cluster manager node. For comprehensive information about discovery and cluster formation settings, see Discovery and cluster formation settings.
+
+# Sets the time interval between attempts to find all peers when a node is in decommissioned state. When a node is being decommissioned, it continues to discover other nodes at this interval to maintain cluster membership information during the decommission process. This helps ensure proper coordination during controlled node removal. Default is 120s (2 minutes). Minimum is 1000ms. (Static, time unit)
+discovery.find_peers_interval_during_decommission: 
+# Sets the timeout period for unconfigured bootstrap process during cluster formation. This setting controls how long a node will wait during the bootstrap phase when the cluster is not properly configured (e.g., when cluster.initial_cluster_manager_nodes is not set). After this timeout, the node will proceed with bootstrap operations or fail appropriately. This setting helps prevent nodes from waiting indefinitely in unconfigured states. Default is 3s. Minimum is 1ms. (Static, time unit)
+discovery.unconfigured_bootstrap_timeout: 
+
+---
+# Gateway settings
+# The local gateway stores on-disk cluster state and shard data that is used when a cluster is restarted. The following local gateway settings are supported:
+
+# The minimum number of data nodes that must be running after a full cluster restart before recovery can begin. Default: 0 Recommendation: Set to a significant portion of the data nodes—approximately 50–70% of the total data nodes—to avoid premature recovery. (Static, integer)
+gateway.recover_after_data_nodes: 
+# The expected number of data nodes in the cluster. When all are present, recovery of local shards can start immediately. Default: 0 Recommendation: Set this to the actual number of data nodes in your cluster so that recovery can start immediately once all data nodes are running. (Static, integer)
+gateway.expected_data_nodes: 
+# The maximum amount of time to wait until recovery if the expected data node count hasn’t been reached. After this time, recovery proceeds. Default: 5m if expected_data_nodes or recover_after_nodes is set. Otherwise disabled. Recommendation: Set slightly above your typical node join time; larger clusters often need longer to recover and are tuned based on observed startup behavior. (Static, time unit)
+gateway.recover_after_time: 
+# Controls whether OpenSearch writes information about dangling indexes to disk during cluster state persistence. When enabled, the system maintains metadata about indexes that exist on disk but are not part of the current cluster state, which can help with recovery and troubleshooting scenarios. Default is true. (Static, Boolean)
+gateway.write_dangling_indices_info: 
+# Controls whether OpenSearch automatically imports dangling indexes discovered during cluster startup. Dangling indexes are indexes that exist on disk but are not part of the current cluster state, typically left behind after improper cluster shutdowns or node removals. When enabled, these orphaned indexes are automatically imported back into the cluster state during startup. When disabled, dangling indexes remain on disk but are not automatically imported, requiring manual intervention through the Dangling Indices API. This setting helps recover potentially lost data but should be used carefully to avoid importing unwanted indiexes. Default is true. (Static, Boolean)
+gateway.auto_import_dangling_indices: 
+################################################
+
+################################################
+# Security settings
+
+---
+# Common settings
+# The Security plugin supports the following common settings:
+
+# Specifies a list of distinguished names (DNs) that denote the other nodes in the cluster. This setting supports wildcards and regular expressions. The list of DNs are also read from the security index in addition to the YAML configuration when plugins.security.nodes_dn_dynamic_config_enabled is true. If this setting is not configured correctly, the cluster will fail to form as the nodes will not be able to trust each other and will result in the following error: Transport client authentication no longer supported. (Static)
+plugins.security.nodes_dn: 
+# Relevant for cross_cluster use cases where there is a need to manage the allow listed nodes_dn without having to restart the nodes every time a new cross_cluster remote is configured. Setting nodes_dn_dynamic_config_enabled to true enables super-admin callable Distinguished Names APIs, which provide means to update or retrieve nodes_dn dynamically. This setting only has effect if plugins.security.cert.intercluster_request_evaluator_class is not set. Default is false. (Static)
+plugins.security.nodes_dn_dynamic_config_enabled: 
+# Defines the DNs of certificates to which admin privileges should be assigned. Required. (Static)
+plugins.security.authcz.admin_dn: 
+# Defines how backend roles are mapped to Security roles. The following values are supported: MAPPING_ONLY(Default): Mappings must be configured explicitly in roles_mapping.yml. BACKENDROLES_ONLY: Backend roles are mapped to security roles directly. Settings in roles_mapping.yml have no effect. BOTH: Backend roles are mapped to security roles both directly and through roles_mapping.yml. (Static)
+plugins.security.roles_mapping_resolution: 
+# Sets the document-level security (DLS) evaluation mode. Default is adaptive. See How to set the DLS evaluation mode. (Static)
+plugins.security.dls.mode: 
+# The salt to use when generating the hash value for field masking. Must be at least 32 characters. Only ASCII characters are allowed. Optional. (Static)
+plugins.security.compliance.salt: 
+# Documents in indexes that are marked as immutable follow the write-once, read-many paradigm. Documents created in these indexes cannot be changed and are therefore immutable. (Static)
+plugins.security.compliance.immutable_indices: 
+# Enables anonymous authentication. This will cause all HTTP authenticators to not challenge. Default is false. (Static)
+config.dynamic.http.anonymous_auth_enabled: 
+# Enables a detailed error message for REST calls performed against the OpenSearch cluster. If set to true, provides the root_cause together with the error code. Default is true. (Static)
+http.detailed_errors.enabled: 
+
+---
+# REST management API settings
+# The Security plugin supports the following REST management API settings:
+
+# Enables role-based access to the REST management API for listed roles. Roles are separated by a comma. Default is an empty list (no role is allowed to access the REST management API). See Access control for the API. (Static)
+plugins.security.restapi.roles_enabled: 
+# Disables specific endpoints and their HTTP methods for roles. Values for this setting compose an array of HTTP methods. For example: plugins.security.restapi.endpoints_disabled.all_access.ACTIONGROUPS: ["PUT","POST","DELETE"]. By default, all endpoints and methods are allowed. Existing endpoints include ACTIONGROUPS, CACHE, CONFIG, ROLES, ROLESMAPPING, INTERNALUSERS, SYSTEMINFO, PERMISSIONSINFO, and LICENSE. See Access control for the API. (Static)
+plugins.security.restapi.endpoints_disabled.<role>.<endpoint>: 
+# Specifies a regular expression to set the criteria for the login password. For more information, see Password settings. (Static)
+plugins.security.restapi.password_validation_regex: 
+# Specifies an error message that loads when a password doesn’t pass validation. This setting is used in conjunction with plugins.security.restapi.password_validation_regex. (Static)
+plugins.security.restapi.password_validation_error_message: 
+# Sets the minimum number of characters for the password length when using the score-based password strength estimator. The default is 8. This is also the minimum. For more information, see Password settings. (Static)
+plugins.security.restapi.password_min_length: 
+# Sets a threshold to determine whether the password is strong or weak. Valid values are fair, good, strong, and very_strong. This setting is used in conjunction with plugins.security.restapi.password_min_length. (Static)
+plugins.security.restapi.password_score_based_validation_strength: 
+# Enables the use of the PUT and PATCH methods for the configuration APIs. (Static)
+plugins.security.unsupported.restapi.allow_securityconfig_modification: 
+
+---
+# Advanced settings
+# The Security plugin supports the following advanced settings:
+
+# Enables transport layer impersonation. This allows DNs to impersonate as other users. See User impersonation. (Static)
+plugins.security.authcz.impersonation_dn: 
+# Enables REST layer impersonation. This allows users to impersonate as other users. See User impersonation. (Static)
+plugins.security.authcz.rest_impersonation_user: 
+# When set to true, OpenSearch Security will automatically initialize the configuration index with the files in the /config directory if the index does not exist. This will use well-known default passwords. Use only in a private network/environment. (Static)
+plugins.security.allow_default_init_securityindex: 
+# When set to true, OpenSearch starts up with demo certificates. These certificates are issued only for demo purposes. These certificates are well known and therefore unsafe for production. Use only in a private network/environment. (Static)
+plugins.security.allow_unsafe_democertificates: 
+# Enables the system index permissions feature. When set to true, the feature is enabled and users with permission to modify roles can create roles that include permissions that grant access to system indexes. When set to false, the permission is disabled and only admins with an admin certificate can make changes to system indexes. By default, the permission is set to false in a new cluster. (Static)
+plugins.security.system_indices.permission.enabled: 
+
+---
+# Expert-level settings
+# An expert-level setting should only be configured and deployed by an admin who understands the feature completely. Misunderstandings of a feature can lead to security risks, cause the Security plugin to not operate properly, or cause data loss.
+# The Security plugin supports the following expert-level settings:
+
+# The name of the index where .opendistro_security stores its configuration. (Static)
+plugins.security.config_index_name: 
+# Defines the Object Identifier (OID) of server node certificates. (Static)
+plugins.security.cert.oid: 
+# Specifies the implementation of org.opensearch.security.transport.InterClusterRequestEvaluator that is used to evaluate intercluster requests. Instances of org.opensearch.security.transport.InterClusterRequestEvaluator must implement a single-argument constructor that takes an org.opensearch.common.settings.Settings object. (Static)
+plugins.security.cert.intercluster_request_evaluator_class: 
+# When set to false, this setting disables snapshot restore for regular users. In this case, only snapshot restore requests signed by an admin TLS certificate are accepted. When set to true (default), regular users can restore snapshots if they have the cluster:admin/snapshot/restore, indices:admin/create, and indices:data/write/index privileges. A snapshot can only be restored when it does not contain global state and does not restore the .opendistro_security index. (Static)
+plugins.security.enable_snapshot_restore_privilege: 
+# When set to false, additional index checks are omitted. When set to the default of true, attempts to restore snapshots are evaluated for indices:admin/create and "indices:data/write/index. (Static)
+plugins.security.check_snapshot_restore_write_privileges: 
+# Determines how long it takes for authentication caching to time out. The authentication cache helps speed up authentication by temporarily storing user objects returned from the backend so that the Security plugin is not required to make repeated requests for them. Set the value in minutes. The default is 60. Disable caching by setting the value to 0. (Static)
+plugins.security.cache.ttl_minutes: 
+# Disables OpenSearch Security. Disabling this plugin can expose your configuration (including passwords) to the public. (Static)
+plugins.security.disabled: 
+# If set to true, enables protected indexes. Protected indexes are even more secure than regular indexes. These indexes require a role to access like any other traditional index and require an additional role to be visible. This setting is used in conjunction with the plugins.security.protected_indices.roles and plugins.security.protected_indices.indices settings. (Static)
+plugins.security.protected_indices.enabled: 
+# Specifies a list of roles to which a user must be mapped to access protected indexes. (Static)
+plugins.security.protected_indices.roles: 
+# Specifies a list of indexes to mark as protected. These indexes will only be visible to users mapped to the roles specified in plugins.security.protected_indices.roles. After this requirement is fulfilled, a user will still need to be mapped to the traditional role used to grant access permission to the index. (Static)
+plugins.security.protected_indices.indices: 
+# If set to true, enables system indexes. System indexes are similar to the security index, except that the contents are not encrypted. Indexes configured as system indexes can be accessed by either a super-admin or a user with a role that includes the system index permission. For more information about system indexes, see System indexes. (Static)
+plugins.security.system_indices.enabled: 
+# A list of indexes to be used as system indexes. This setting is controlled by the plugins.security.system_indices.enabled setting. (Static)
+plugins.security.system_indices.indices: 
+# When set to true, sets the Security plugin to its default security settings if an attempt to create the security index fails when OpenSearch launches. Default security settings are stored in YAML files contained in the opensearch-project/security/config directory. Default is false. (Static)
+plugins.security.allow_default_init_securityindex: 
+# A class to be used for evaluating intercluster communication. (Static)
+plugins.security.cert.intercluster_request_evaluator_class: 
+# Enables granting the snapshot restore privilege. Optional. Default is true. (Static)
+plugins.security.enable_snapshot_restore_privilege: 
+# Enforces write privilege evaluation when creating snapshots. Default is true. If you change any of the following password hashing properties, you must rehash all internal passwords to ensure compatibility and security. (Static)
+plugins.security.check_snapshot_restore_write_privileges: 
+# Specifies the password hashing algorithm to use. The following values are supported: BCrypt (Default), PBKDF2 (Compliant with FIPS 140-2 and FIPS 140-3), Argon2 (Static)
+plugins.security.password.hashing.algorithm: 
+# Specifies the number of rounds to use for password hashing with BCrypt. Valid values are between 4 and 31, inclusive. Default is 12. (Static)
+plugins.security.password.hashing.bcrypt.rounds: 
+# Specifies the minor version of the BCrypt algorithm to use for password hashing. The following values are supported: A, B, Y (Default) (Static)
+plugins.security.password.hashing.bcrypt.minor: 
+# Specifies the pseudo-random function applied to the password. The following values are supported: SHA1, SHA224, SHA256 (Default), SHA384, SHA512 (Static)
+plugins.security.password.hashing.pbkdf2.function: 
+# Specifies the number of times that the pseudo-random function is applied to the password. Default is 600,000. (Static)
+plugins.security.password.hashing.pbkdf2.iterations: 
+# Specifies the desired length of the final derived key. Default is 256. (Static)
+plugins.security.password.hashing.pbkdf2.length: 
+# Specifies the number of passes over memory that the algorithm performs. Increasing this value raises CPU computation time and improves resistance to brute-force attacks. Default: 3.
+plugins.security.password.hashing.argon2.iterations: 
+# Specifies the amount of memory (in kibibytes) used during hashing. Default: 65536 (64 MiB).
+plugins.security.password.hashing.argon2.memory: 
+# Specifies the number of parallel threads used for computation. Default: 1.
+plugins.security.password.hashing.argon2.parallelism: 
+# Specifies the length (in bytes) of the resulting hash output. Default: 32.
+plugins.security.password.hashing.argon2.length: 
+# Specifies which variant of Argon2 to use. The following values are supported: Argon2i, Argon2d, Argon2id (default)
+plugins.security.password.hashing.argon2.type: 
+# Specifies which version of Argon2 to use. The following values are supported: 16, 19 (default)
+plugins.security.password.hashing.argon2.version: 
+
+---
+# Audit log settings
+# The Security plugin supports the following audit log settings:
+
+
+# Enables or disables REST request logging. Default is true (enable). (Dynamic)
+plugins.security.audit.enable_rest: 
+# Enables or disables transport-level request logging. Default is false (disable). (Dynamic)
+plugins.security.audit.enable_transport: 
+# Enable or disable bulk request logging. When enabled, all subrequests in bulk requests are also logged. Default is false (disabled). (Dynamic)
+plugins.security.audit.resolve_bulk_requests: 
+# Disables the specified event categories. (Dynamic)
+plugins.security.audit.config.disabled_categories: 
+# Excludes the specified requests from being logged. Allows wildcards and regular expressions containing actions or REST request paths. (Dynamic)
+plugins.security.audit.ignore_requests: 
+# Determines the number of threads in the thread pool used to log events. Default is 10. Setting this value to 0 disables the thread pool, which means the plugin logs events synchronously. (Static)
+plugins.security.audit.threadpool.size: 
+# Sets the maximum queue length per thread. Default is 100000. (Static)
+plugins.security.audit.threadpool.max_queue_len: 
+# An array of users. Audit requests from the users in the list will not be logged. (Dynamic)
+plugins.security.audit.ignore_users: 
+# The destination of audit log events. Valid values are internal_opensearch, external_opensearch, debug, and webhook. (Static)
+plugins.security.audit.type: 
+# A list of endpoints for localhost. (Static)
+plugins.security.audit.config.http_endpoints: 
+# The audit log index. The default is auditlog6. The index can be static or an index that includes a date so that it rotates on a daily basis, for example, "'auditlog6-'YYYY.MM.dd". In either case, make sure to secure the index properly. (Static)
+plugins.security.audit.config.index: 
+# Specify the audit log type as auditlog. (Static)
+plugins.security.audit.config.type: 
+# Username for the audit log configuration. (Static)
+plugins.security.audit.config.username: 
+# Password for the audit log configuration. (Static)
+plugins.security.audit.config.password: 
+# Enables or disables SSL for audit logging. (Static)
+plugins.security.audit.config.enable_ssl: 
+# Enables or disables verification of the hostname for SSL/TLS certificates. Default is true (enabled). (Static)
+plugins.security.audit.config.verify_hostnames: 
+# Enables or disables SSL/TLS client authentication. Default is false (disabled). (Static)
+plugins.security.audit.config.enable_ssl_client_auth: 
+# An alias to the certificate used for audit log access. (Static)
+plugins.security.audit.config.cert_alias: 
+# The /config relative file path to the Privacy Enhanced Mail (PEM) key used for audit logging. (Static)
+plugins.security.audit.config.pemkey_filepath: 
+# The Base64-encoded content of the PEM key used for audit logging. This is an alternative to ...config.pemkey_filepath. (Static)
+plugins.security.audit.config.pemkey_content: 
+# Password for the PEM-formatted private key used by the client. (Static)
+plugins.security.audit.config.pemkey_password: 
+# The /config relative file path to the PEM certificate used for audit logging. (Static)
+plugins.security.audit.config.pemcert_filepath: 
+# The Base64-encoded content of the PEM certificate used for audit logging. This is an alternative to specifying the file path with ...config.pemcert_filepath. (Static)
+plugins.security.audit.config.pemcert_content: 
+# The /config relative filepath to trusted root certificate authority. (Static)
+plugins.security.audit.config.pemtrustedcas_filepath: 
+# The Base64-encoded content of the root certificate authority. This is an alternative to ...config.pemtrustedcas_filepath. (Static)
+plugins.security.audit.config.pemtrustedcas_content: 
+# The webhook URL. (Static)
+plugins.security.audit.config.webhook.url: 
+# The format used for the webhook. Valid values are URL_PARAMETER_GET, URL_PARAMETER_POST, TEXT, JSON, and SLACK. (Static)
+plugins.security.audit.config.webhook.format: 
+# Enables or disables verification of any SSL/TLS certificates sent with any webhook request. Default is true (enabled). (Static)
+plugins.security.audit.config.webhook.ssl.verify: 
+# The /config relative file path to trusted certificate authority against which webhook requests are verified. (Static)
+plugins.security.audit.config.webhook.ssl.pemtrustedcas_filepath: 
+# The Base64-encoded content of the certificate authority used to verify webhook requests. This is an alternative to ...config.pemtrustedcas_filepath. (Static)
+plugins.security.audit.config.webhook.ssl.pemtrustedcas_content: 
+# A custom name for the Log4j logger. (Static)
+plugins.security.audit.config.log4j.logger_name: 
+# Provides a default log level for the Log4j logger. Valid values are OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, and ALL. Default is INFO. (Static)
+plugins.security.audit.config.log4j.level: 
+# A list of REST categories to be ignored by the logger. Valid values are AUTHENTICATED and GRANTED_PRIVILEGES. (Dynamic)
+opendistro_security.audit.config.disabled_rest_categories: 
+# A list of transport layer categories to be ignored by the logger. Valid values are AUTHENTICATED and GRANTED_PRIVILEGES. (Dynamic)
+opendistro_security.audit.config.disabled_transport_categories: 
+
+---
+# Hostname verification and DNS lookup settings
+# The Security plugin supports the following hostname verification and DNS lookup settings:
+
+# Whether to verify hostnames on the transport layer. Optional. Default is true. (Static)
+transport.ssl.enforce_hostname_verification: 
+# Whether to resolve hostnames against DNS on the transport layer. Optional. Default is true. Only works if hostname verification is enabled. (Static)
+transport.ssl.resolve_hostname: 
+
+---
+# Client authentication settings
+# The Security plugin supports the following client authentication setting:
+
+# The TLS client authentication mode to use. Valid values are OPTIONAL (default), REQUIRE, and NONE. Optional. (Static)
+plugins.security.ssl.http.clientauth_mode: 
+
+---
+# Enabled cipher and protocol settings
+# The Security plugin supports the following enabled cipher and protocol settings. Each setting must be expressed in an array:
+
+# Enabled TLS cipher suites for the REST layer. Only Java format is supported. (Static)
+plugins.security.ssl.http.enabled_ciphers: 
+# Enabled TLS protocols for the REST layer. Only Java format is supported. (Static)
+plugins.security.ssl.http.enabled_protocols: 
+# Enabled TLS cipher suites for the transport layer. Only Java format is supported. (Static)
+plugins.security.ssl.transport.enabled_ciphers: 
+# Enabled TLS protocols for the transport layer. Only Java format is supported. (Static)
+plugins.security.ssl.transport.enabled_protocols: 
+
+---
+# Key store and trust store files—transport layer TLS settings
+# The Security plugin supports the following transport layer TLS key store and trust store settings:
+
+# The type of the key store file. Optional. Valid values are JKS or PKCS12/PFX. Default is JKS. (Static)
+plugins.security.ssl.transport.keystore_type: 
+# The path to the key store file, which must be under the config directory, specified using a relative path. Required. (Static)
+plugins.security.ssl.transport.keystore_filepath: 
+# The key store alias name. Optional. Default is the first alias. (Static)
+plugins.security.ssl.transport.keystore_alias: 
+# The key store password. Default is changeit. (Static)
+plugins.security.ssl.transport.keystore_password: 
+# The type of the trust store file. Optional. Valid values are JKS or PKCS12/PFX. Default is JKS. (Static)
+plugins.security.ssl.transport.truststore_type: 
+# The path to the trust store file, which must be under the config directory, specified using a relative path. Required. (Static)
+plugins.security.ssl.transport.truststore_filepath: 
+# The trust store alias name. Optional. Default is all certificates. (Static)
+plugins.security.ssl.transport.truststore_alias: 
+# The trust store password. Default is changeit. (Static)
+plugins.security.ssl.transport.truststore_password: 
+
+---
+# Key store and trust store files—REST layer TLS settings
+# The Security plugin supports the following REST layer TLS key store and trust store settings:
+
+# Whether to enable TLS on the REST layer. If enabled, only HTTPS is allowed. Optional. Default is false. (Static)
+plugins.security.ssl.http.enabled: 
+# The type of the key store file. Optional. Valid values are JKS or PKCS12/PFX. Default is JKS. (Static)
+plugins.security.ssl.http.keystore_type: 
+# The path to the key store file, which must be under the config directory, specified using a relative path. Required. (Static)
+plugins.security.ssl.http.keystore_filepath: 
+# The key store alias name. Optional. Default is the first alias. (Static)
+plugins.security.ssl.http.keystore_alias: 
+# The key store password. Default is changeit.
+plugins.security.ssl.http.keystore_password: 
+# The type of the trust store file. Optional. Valid values are JKS or PKCS12/PFX. Default is JKS.
+plugins.security.ssl.http.truststore_type: 
+# The path to the trust store file, which must be under the config directory, specified using a relative path. Required.
+plugins.security.ssl.http.truststore_filepath: 
+# The trust store alias name. Optional. Default is all certificates. (Static)
+plugins.security.ssl.http.truststore_alias: 
+# The trust store password. Default is changeit. (Static)
+plugins.security.ssl.http.truststore_password: 
+
+---
+# X.509 PEM certificates and PKCS #8 keys—transport layer TLS settings
+# The Security plugin supports the following transport layer TLS settings related to X.509 PEM certificates and PKCS #8 keys:
+
+# The path to the certificate’s key file (PKCS #8), which must be under the config directory, specified using a relative path. Required.
+plugins.security.ssl.transport.pemkey_filepath (Static): 
+# The key password. Omit this setting if the key has no password. Optional.
+plugins.security.ssl.transport.pemkey_password (Static): 
+# The path to the X.509 node certificate chain (PEM format), which must be under the config directory, specified using a relative path. Required.
+plugins.security.ssl.transport.pemcert_filepath (Static): 
+# The path to the root certificate authorities (PEM format), which must be under the config directory, specified using a relative path. Required.
+plugins.security.ssl.transport.pemtrustedcas_filepath (Static): 
+
+---
+# X.509 PEM certificates and PKCS #8 keys—REST layer TLS settings
+# The Security plugin supports the following REST layer TLS settings related to X.509 PEM certificates and PKCS #8 keys:
+
+# Whether to enable TLS on the REST layer. If enabled, only HTTPS is allowed. Optional. Default is false. (Static)
+plugins.security.ssl.http.enabled: 
+# The path to the certificate’s key file (PKCS #8), which must be under the config directory, specified using a relative path. Required. (Static)
+plugins.security.ssl.http.pemkey_filepath: 
+# The key password. Omit this setting if the key has no password. Optional. (Static)
+plugins.security.ssl.http.pemkey_password: 
+# The path to the X.509 node certificate chain (PEM format), which must be under the config directory, specified using a relative path. Required. (Static)
+plugins.security.ssl.http.pemcert_filepath: 
+# The path to the root certificate authorities (PEM format), which must be under the config directory, specified using a relative path. Required.
+plugins.security.ssl.http.pemtrustedcas_filepath: 
+
+---
+# Transport layer security settings
+# The Security plugin supports the following transport layer security settings:
+
+# Whether to enable TLS on the REST layer. (Static)
+plugins.security.ssl.transport.enabled: 
+# The password for the PEM-formatted private key used by the transport client. (Static)
+plugins.security.ssl.transport.client.pemkey_password: 
+# The password for the key inside the key store. (Static)
+plugins.security.ssl.transport.keystore_keypassword: 
+# The password for the key inside the server key store. (Static)
+plugins.security.ssl.transport.server.keystore_keypassword: 
+# The alias name for the key store of the server. (Static)
+plugins.sercurity.ssl.transport.server.keystore_alias: 
+# The alias name for the key store of the client. (Static)
+plugins.sercurity.ssl.transport.client.keystore_alias: 
+# The alias name for the trust store of the server. (Static)
+plugins.sercurity.ssl.transport.server.truststore_alias: 
+# The alias name for the trust store of the client. (Static)
+plugins.sercurity.ssl.transport.client.truststore_alias: 
+# Provides the transport client an ID to use for an external SSL context. (Static)
+plugins.security.ssl.client.external_context_id: 
+# Specifies a class implementing an extractor so a custom part of the certificate is used as the principal. (Static)
+plugins.secuirty.ssl.transport.principal_extractor_class: 
+# A file path to a certificate revocation list file. (Static)
+plugins.security.ssl.http.crl.file_path: 
+# Enables certificate revocation list (CRL) validation. Default is false (disabled). (Static)
+plugins.security.ssl.http.crl.validate: 
+# Whether to prefer the CRL certificate entry over the Online Certificate Status Protocol (OCSP) entry if the certificate contains both. Optional. Default is false. (Static)
+plugins.security.ssl.http.crl.prefer_crlfile_over_ocsp: 
+# When true, only leaf certificates are validated. Default is true. (Static)
+plugins.security.ssl.http.crl.check_only_end_entitites: 
+# Disables OCSP. Default is false (OCSP is enabled). (Static)
+plugins.security.ssl.http.crl.disable_ocsp: 
+# Disables CRL endpoints in certificates. Default is false (CRL endpoints are enabled). (Static)
+plugins.security.ssl.http.crl.disable_crldp: 
+# Enables or disables client renegotiation. Default is false (client initiated renegotiation is not allowed). (Static)
+plugins.security.ssl.allow_client_initiated_renegotiation: 
+# Enables dual-mode SSL, allowing a node to accept both encrypted (TLS) and non-encrypted traffic on the transport layer. When set to true, nodes can communicate with other nodes using either SSL or non-SSL connections. This setting is designed for transitional scenarios, such as migrating a cluster from having security disabled to having security enabled through a rolling restart process. This setting should not be used indefinitely in production environments. Use it only temporarily during the migration, and disable it once all nodes in the cluster are using the same security configuration. Default is false. (Static)
+plugins.security_config.ssl_dual_mode_enabled: 
+################################################
+
+################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

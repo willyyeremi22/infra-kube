@@ -1,0 +1,31 @@
+0,,,ARG RELEASE,,,0 B
+1,,,ARG LAUNCHPAD_BUILD_ARCH,,,0 B
+2,,,LABEL org.opencontainers.image.ref.name=ubuntu,,,0 B
+3,,,LABEL org.opencontainers.image.version=22.04,,,0 B
+4,,,ADD file:b499000226bd9a7c562ffa8eeb86e2d170f2a563310db6c2d79562ab53e5cb6e in /,,,87.5 MB
+5,,,CMD ["/bin/bash"],,,0 B
+6,,,ENV JAVA_HOME=/opt/java/openjdk,,,0 B
+7,,,ENV PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,,,0 B
+8,,,ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8,,,0 B
+9,,,RUN /bin/sh -c set -eux; apt-get update; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl wget gnupg fontconfig ca-certificates p11-kit binutils tzdata locales ; echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen; locale-gen en_US.UTF-8; rm -rf /var/lib/apt/lists/* # buildkit,,,65.4 MB
+10,,,ENV JAVA_VERSION=jdk-17.0.17+10,,,0 B
+11,,,RUN /bin/sh -c set -eux; ARCH="$(dpkg --print-architecture)"; case "${ARCH}" in amd64) ESUM='992f96e7995075ac7636bb1a8de52b0c61d71ed3137fafc979ab96b4ab78dd75'; BINARY_URL='https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.17%2B10/OpenJDK17U-jdk_x64_linux_hotspot_17.0.17_10.tar.gz'; ;; arm64) ESUM='dc29ca6d35beb4419b4b00419b8a3dfbf5ae551e1ae2b046b516d9a579d04533'; BINARY_URL='https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.17%2B10/OpenJDK17U-jdk_aarch64_linux_hotspot_17.0.17_10.tar.gz'; ;; armhf) ESUM='a0129be48dfbd16b7c6a158bf9e91683be2e292c473085294a6d436bbc5f4ea9'; BINARY_URL='https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.17%2B10/OpenJDK17U-jdk_arm_linux_hotspot_17.0.17_10.tar.gz'; ;; ppc64el) ESUM='2a29d1be61940c1bd639018c07f4622e1f145a7ef34e7294fee877e39226d9da'; BINARY_URL='https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.17%2B10/OpenJDK17U-jdk_ppc64le_linux_hotspot_17.0.17_10.tar.gz'; ;; s390x) ESUM='76327b1d00c67f6be91717754fd85fc85ce496d48876f69accb9c53ed31dc546'; BINARY_URL='https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.17%2B10/OpenJDK17U-jdk_s390x_linux_hotspot_17.0.17_10.tar.gz'; ;; *) echo "Unsupported arch: ${ARCH}"; exit 1; ;; esac; wget --progress=dot:giga -O /tmp/openjdk.tar.gz ${BINARY_URL}; wget --progress=dot:giga -O /tmp/openjdk.tar.gz.sig ${BINARY_URL}.sig; export GNUPGHOME="$(mktemp -d)"; gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B; gpg --batch --verify /tmp/openjdk.tar.gz.sig /tmp/openjdk.tar.gz; rm -rf "${GNUPGHOME}" /tmp/openjdk.tar.gz.sig; echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; mkdir -p "$JAVA_HOME"; tar --extract --file /tmp/openjdk.tar.gz --directory "$JAVA_HOME" --strip-components 1 --no-same-owner ; rm -f /tmp/openjdk.tar.gz ${JAVA_HOME}/lib/src.zip; find "$JAVA_HOME/lib" -name '*.so' -exec dirname '{}' ';' | sort -u > /etc/ld.so.conf.d/docker-openjdk.conf; ldconfig; java -Xshare:dump; # buildkit,,,279.97 MB
+12,,,RUN /bin/sh -c set -eux; echo "Verifying install ..."; fileEncoding="$(echo 'System.out.println(System.getProperty("file.encoding"))' | jshell -s -)"; [ "$fileEncoding" = 'UTF-8' ]; rm -rf ~/.java; echo "javac --version"; javac --version; echo "java --version"; java --version; echo "Complete." # buildkit,,,12.29 KB
+13,,,COPY --chmod=755 entrypoint.sh /__cacert_entrypoint.sh # buildkit,,,12.29 KB
+14,,,ENTRYPOINT ["/__cacert_entrypoint.sh"],,,0 B
+15,,,CMD ["jshell"],,,0 B
+16,,,RUN /bin/sh -c apt update -q && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends bc curl iputils-ping pdsh python3 python3-pip python-is-python3 ssh tzdata vim xmlstarlet krb5-user && apt clean # buildkit,,,277.52 MB
+17,,,RUN /bin/sh -c pip install apache-ranger requests && rm -rf ~/.cache/pip # buildkit,,,3.8 MB
+18,,,ENV RANGER_DIST=/home/ranger/dist,,,0 B
+19,,,ENV RANGER_SCRIPTS=/home/ranger/scripts,,,0 B
+20,,,ENV RANGER_HOME=/opt/ranger,,,0 B
+21,,,ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin,,,0 B
+22,,,RUN /bin/sh -c mkdir -p ${RANGER_DIST} ${RANGER_SCRIPTS} ${RANGER_HOME} && chmod +rx /home/ranger ${RANGER_DIST} ${RANGER_SCRIPTS} # buildkit,,,28.67 KB
+23,,,COPY docker/create_users_and_groups.sh /home/ranger/scripts # buildkit,,,20.48 KB
+24,,,RUN /bin/sh -c chmod +x ${RANGER_SCRIPTS}/create_users_and_groups.sh && ${RANGER_SCRIPTS}/create_users_and_groups.sh # buildkit,,,659.46 KB
+25,,,RUN /bin/sh -c groupadd -g 3002 opensearch && useradd -u 3002 -g opensearch -G hadoop -s /bin/bash opensearch # buildkit,,,1.04 MB
+26,,,COPY docker/krb/* /home/ranger/scripts # buildkit,,,24.58 KB
+27,,,RUN /bin/sh -c chmod 755 ${RANGER_SCRIPTS}/wait_for_keytab.sh && chmod 755 ${RANGER_SCRIPTS}/wait_for_testusers_keytab.sh # buildkit,,,24.58 KB
+28,,,RUN /bin/sh -c chown -R ranger:ranger /home/ranger /opt/ranger # buildkit,,,40.96 KB
+29,,,ENTRYPOINT ["/bin/bash"],,,0 B
+

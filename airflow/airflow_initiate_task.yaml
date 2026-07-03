@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-init
+  namespace: airflow
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: airflow-init
+    spec:
+      restartPolicy: Never
+      serviceAccountName: airflow
+      containers:
+        - name: airflow-init
+          image: apache/airflow:3.2.2-python3.14-fab
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - secretRef:
+                name: airflow-secret
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - |
+              set -e
+              echo "Migrating database..."
+              airflow db migrate
+              echo "Creating admin user..."
+              airflow users create \
+                --username "${AIRFLOW_ADMIN_USERNAME}" \
+                --password "${AIRFLOW_ADMIN_PASSWORD}" \
+                --firstname "${AIRFLOW_ADMIN_FIRSTNAME}" \
+                --lastname "${AIRFLOW_ADMIN_LASTNAME}" \
+                --role Admin \
+                --email "${AIRFLOW_ADMIN_EMAIL}" || true
+              echo "Airflow initialization completed."
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
