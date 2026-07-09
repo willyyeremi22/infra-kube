@@ -9,9 +9,77 @@ metadata:
   namespace: opensearch
 data:
   opensearch.yml: |
-    cluster.name: opensearch-cluster
+    # =========================================================
+    # COMMON CONFIG — berlaku untuk SEMUA node (manager/data/coordinator)
+    # File ini akan digabung oleh initContainer dengan config
+    # spesifik tiap role (lihat opensearch-configmap-<role>.yaml)
+    # =========================================================
+ 
+    # --- Cluster & node identity ---
+    cluster.name: "opensearch-cluster"
+    # ${HOSTNAME} otomatis di-resolve oleh OpenSearch dari env pod (nama pod StatefulSet)
+    node.name: "${HOSTNAME}"
+ 
+    # --- Network ---
     network.host: 0.0.0.0
-    discovery.seed_hosts:
-    - opensearch-cluster-master-headless
-    cluster.initial_cluster_manager_nodes:
-    - opensearch-cluster-master-0
+ 
+    # --- Memory & storage ---
+    bootstrap.memory_lock: true
+    node.store.allow_mmap: true
+ 
+    # --- Bootstrap / system security ---
+    # false karena seccomp default container runtime sering memblokir syscall filter OpenSearch
+    bootstrap.system_call_filter: false
+ 
+    # --- Path (sesuaikan dengan mountPath volume/PVC di StatefulSet) ---
+    path.data: /usr/share/opensearch/data
+    path.logs: /usr/share/opensearch/logs
+ 
+    # --- Gateway (hindari recovery prematur saat rolling restart) ---
+    # TODO: sesuaikan angka dengan jumlah data node aktual di cluster Anda
+    gateway.recover_after_data_nodes: 2
+    gateway.expected_data_nodes: 3
+    gateway.recover_after_time: 5m
+ 
+    # --- Security plugin: common ---
+    plugins.security.nodes_dn:
+      - "CN=*.opensearch-cluster.opensearch.svc.cluster.local,OU=node,O=MyOrg,L=City,ST=State,C=ID"
+    plugins.security.authcz.admin_dn:
+      - "CN=admin,OU=client,O=MyOrg,L=City,ST=State,C=ID"
+    plugins.security.restapi.roles_enabled:
+      - "all_access"
+      - "security_rest_api_access"
+ 
+    # --- TLS transport layer (wajib aktif untuk inter-node auth) ---
+    transport.ssl.enforce_hostname_verification: true
+    transport.ssl.resolve_hostname: true
+    plugins.security.ssl.transport.enabled: true
+    plugins.security.ssl.transport.pemcert_filepath: certs/esnode.pem
+    plugins.security.ssl.transport.pemkey_filepath: certs/esnode-key.pem
+    plugins.security.ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
+ 
+    # --- TLS REST layer ---
+    plugins.security.ssl.http.enabled: true
+    plugins.security.ssl.http.clientauth_mode: OPTIONAL
+    plugins.security.ssl.http.pemcert_filepath: certs/esnode.pem
+    plugins.security.ssl.http.pemkey_filepath: certs/esnode-key.pem
+    plugins.security.ssl.http.pemtrustedcas_filepath: certs/root-ca.pem
+ 
+    # =========================================================
+    # OPSIONAL — nonaktif secara default, aktifkan sesuai kebutuhan.
+    # Dibiarkan sebagai referensi, JANGAN uncomment tanpa alasan jelas.
+    # =========================================================
+    # http.cors.enabled: true
+    # http.cors.allow-origin: "https://dashboards.example.com"
+    # plugins.security.restapi.password_min_length: 12
+    # plugins.security.audit.enable_rest: true
+    # plugins.security.ssl.http.enabled_protocols: ["TLSv1.2", "TLSv1.3"]
+ 
+    # =========================================================
+    # PENTING: password (keystore_password, truststore_password,
+    # pemkey_password) TIDAK boleh ditaruh di ConfigMap ini.
+    # Gunakan Kubernetes Secret + volume mount terpisah, atau
+    # generate sertifikat PEM tanpa passphrase untuk menghindari
+    # kebutuhan pemkey_password sama sekali.
+    # =========================================================
+ 
