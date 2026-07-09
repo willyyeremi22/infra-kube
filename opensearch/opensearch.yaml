@@ -478,6 +478,10 @@ data:
     opensearch.pingTimeout: 30000
     opensearch.shardTimeout: 30000
     server.maxPayloadBytes: 1048576
+    opensearch_security.enabled: false
+    data_source.enabled: true
+    workspace.enabled: true
+    explore.enabled: true
 
 ---
 apiVersion: apps/v1
@@ -512,11 +516,11 @@ spec:
             port: 5601
         readinessProbe:
           httpGet:
-            path: /api/status
+            path: /
             port: 5601
         livenessProbe:
           httpGet:
-            path: /api/status
+            path: /
             port: 5601
         resources:
           requests:

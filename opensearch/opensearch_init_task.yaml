@@ -1,0 +1,229 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opensearch-bootstrap-secret
+  namespace: opensearch
+type: Opaque
+stringData:
+  ADMIN_USER: admin
+  ADMIN_PASSWORD: admin
+  RANGER_USER: ranger_audit
+  RANGER_PASSWORD: admin
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-bootstrap-script
+  namespace: opensearch
+data:
+  bootstrap.sh: |
+    #!/bin/sh
+
+    set -eu
+
+    HOST=http://opensearch-coordinator.opensearch.svc.cluster.local:9200
+
+    ##############################################
+    # Wait OpenSearch
+    ##############################################
+
+    until curl -s \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_cluster/health" >/dev/null
+    do
+      sleep 5
+    done
+
+    ##############################################
+    # Cluster Health
+    ##############################################
+
+    until STATUS=$(
+      curl -s \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_cluster/health" \
+      | grep -o '"status":"[^"]*"' \
+      | cut -d'"' -f4
+    )
+    do
+      sleep 2
+    done
+
+    echo "Cluster Status = $STATUS"
+
+    ##############################################
+    # Ranger Role
+    ##############################################
+
+    echo "Creating Role..."
+
+    curl -s \
+      -X PUT \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_plugins/_security/api/roles/ranger_audit_role" \
+      -H "Content-Type: application/json" \
+      -d '
+    {
+      "cluster_permissions":[
+        "cluster_composite_ops"
+      ],
+      "index_permissions":[
+        {
+          "index_patterns":[
+            "ranger_audits*"
+          ],
+          "allowed_actions":[
+            "crud",
+            "create_index"
+          ]
+        }
+      ]
+    }'
+
+    ##############################################
+    # Ranger User
+    ##############################################
+
+    echo "Creating User..."
+
+    curl -s \
+      -X PUT \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_plugins/_security/api/internalusers/$RANGER_USER" \
+      -H "Content-Type: application/json" \
+      -d "
+    {
+      \"password\":\"$RANGER_PASSWORD\"
+    }"
+
+    ##############################################
+    # Role Mapping
+    ##############################################
+
+    echo "Creating Role Mapping..."
+
+    curl -s \
+      -X PUT \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_plugins/_security/api/rolesmapping/ranger_audit_role" \
+      -H "Content-Type: application/json" \
+      -d "
+    {
+      \"users\":[
+        \"$RANGER_USER\"
+      ]
+    }"
+
+    ##############################################
+    # ISM Policy
+    ##############################################
+
+    echo "Creating ISM Policy..."
+
+    curl -s \
+      -X PUT \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_plugins/_ism/policies/ranger_audit_policy" \
+      -H "Content-Type: application/json" \
+      -d '
+    {
+      "policy":{
+        "description":"Ranger Audit Policy",
+        "default_state":"hot",
+        "states":[
+          {
+            "name":"hot",
+            "actions":[],
+            "transitions":[
+              {
+                "state_name":"delete",
+                "conditions":{
+                  "min_index_age":"90d"
+                }
+              }
+            ]
+          },
+          {
+            "name":"delete",
+            "actions":[
+              {
+                "delete":{}
+              }
+            ],
+            "transitions":[]
+          }
+        ]
+      }
+    }'
+
+    ##############################################
+    # Index Template
+    ##############################################
+
+    echo "Creating Index Template..."
+
+    curl -s \
+      -X PUT \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/_index_template/ranger_audits" \
+      -H "Content-Type: application/json" \
+      -d '
+    {
+      "index_patterns":[
+        "ranger_audits-*"
+      ],
+      "template":{
+        "settings":{
+          "number_of_shards":1,
+          "number_of_replicas":0,
+          "plugins.index_state_management.policy_id":"ranger_audit_policy",
+          "plugins.index_state_management.rollover_alias":"ranger_audits"
+        }
+      }
+    }'
+
+    ##############################################
+    # First Index
+    ##############################################
+
+    echo "Checking First Index..."
+
+    HTTP_CODE=$(curl -s -o /dev/null \
+      -w "%{http_code}" \
+      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+      "$HOST/ranger_audits-000001")
+
+    if [ "$HTTP_CODE" = "404" ]; then
+
+      echo "Creating First Index..."
+
+      curl -s \
+        -X PUT \
+        -u "$ADMIN_USER:$ADMIN_PASSWORD" \
+        "$HOST/ranger_audits-000001" \
+        -H "Content-Type: application/json" \
+        -d '
+      {
+        "aliases":{
+          "ranger_audits":{
+            "is_write_index":true
+          }
+        }
+      }'
+
+    else
+
+      echo "Index already exists."
+
+    fi
+
+    ##############################################
+    # Finish
+    ##############################################
+
+    echo ""
+    echo "===================================="
+    echo " Bootstrap Finished"
+    echo "===================================="
