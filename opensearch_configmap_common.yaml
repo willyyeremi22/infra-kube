@@ -3,12 +3,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: opensearch-config-common
-  # labels:
-  #   app.kubernetes.io/name: opensearch
-  #   app.kubernetes.io/part-of: opensearch-cluster
   namespace: opensearch
 data:
-  opensearch.yml: |
+  common.yml: |
     # =========================================================
     # COMMON CONFIG — berlaku untuk SEMUA node (manager/data/coordinator)
     # File ini akan digabung oleh initContainer dengan config
