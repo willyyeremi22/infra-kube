@@ -102,7 +102,7 @@ spec:
         resources:
           requests:
             cpu: "500m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
             cpu: "1"
             memory: "2Gi"
@@ -260,7 +260,7 @@ spec:
         resources:
           requests:
             cpu: "1"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
             cpu: "2"
             memory: "2Gi"
@@ -405,10 +405,10 @@ spec:
         resources:
           requests:
             cpu: "500m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
             cpu: "1"
-            memory: "2Gi"
+            memory: "1Gi"
       volumes:
       - name: opensearch-config-coordinator
         configMap:
@@ -461,3 +461,107 @@ spec:
     port: 9300
   - name: metrics
     port: 9600
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-config-dashboard
+  namespace: opensearch
+data:
+  dashboard.yml: |
+    server.host: "0.0.0.0"
+    opensearch.hosts:
+      - http://opensearch-coordinator.opensearch.svc.cluster.local:9200
+    logging.root.level: info
+    opensearch.requestTimeout: 60000
+    opensearch.pingTimeout: 30000
+    opensearch.shardTimeout: 30000
+    server.maxPayloadBytes: 1048576
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboard
+  namespace: opensearch
+spec:
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: opensearch-dashboard
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboard
+    spec:
+      initContainers:
+      - name: config-file-dashboard
+        image: "opensearchproject/opensearch-dashboards:3.7.0"
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "cat /tmp/configfolder/common.yml /tmp/configfolder/dashboard.yml > /usr/share/opensearch-dashboards/config/opensearch.yml"]
+        volumeMounts:
+        - name: opensearch-config-common
+          mountPath: /tmp/configfolder/common.yml
+          subPath: common.yml
+        - name: opensearch-config-dashboard
+          mountPath: /tmp/configfolder/dashboard.yml
+          subPath: dashboard.yml
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch-dashboards/config
+      containers:
+      - name: opensearch-dashboard
+        image: "opensearchproject/opensearch-dashboards:3.7.0"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5601
+        volumeMounts:
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch-dashboards/config/opensearch.yml
+          subPath: opensearch.yml
+        startupProbe:
+          httpGet:
+            path: /
+            port: 5601
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "256Mi"
+      volumes:
+      - name: opensearch-config-dashboard
+        configMap:
+          name: opensearch-config-dashboard
+          defaultMode: 0755
+      - name: opensearch-config-common
+        configMap:
+          name: opensearch-config-common
+          defaultMode: 0755
+      - name: config-emptydir
+        emptyDir: {}
+
+---
+# Service ini yang paling cocok dijadikan entry point untuk client/Dashboards
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-dashboard
+  namespace: opensearch
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch-dashboard
+  ports:
+  - port: 5601
+    targetPort: 5601
