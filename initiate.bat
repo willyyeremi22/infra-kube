@@ -31,6 +31,7 @@ kubectl apply -f opensearch.yaml -n opensearch
 @REM kubectl port-forward -n minio svc/minio 9001:9001
 @REM kubectl port-forward -n airflow svc/airflow-api-server 8080:8080
 @REM kubectl port-forward -n lldap svc/lldap 17170:17170
+@REM kubectl port-forward -n opensearch svc/opensearch-dashboard 5601:5601
 
 
 kubectl logs -n airflow deployment.apps/airflow-scheduler
@@ -39,7 +40,7 @@ kubectl logs -n ranger deployment.apps/ranger-admin
 kubectl logs -n opensearch statefulset.apps/opensearch-cluster-manager
 kubectl logs -n opensearch statefulset.apps/opensearch-data
 kubectl logs -n opensearch statefulset.apps/opensearch-coordinator
-
+kubectl logs -n opensearch deployment.apps/opensearch-dashboard
 
 docker create --name ranger-temp apache/ranger:2.8.0
 
