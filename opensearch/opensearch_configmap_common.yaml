@@ -16,7 +16,9 @@ data:
     cluster.name: "opensearch-cluster"
     # ${HOSTNAME} otomatis di-resolve oleh OpenSearch dari env pod (nama pod StatefulSet)
     node.name: "${HOSTNAME}"
- 
+    discovery.seed_hosts:
+      - opensearch-cluster-manager-headless
+
     # --- Network ---
     network.host: 0.0.0.0
  
@@ -34,33 +36,34 @@ data:
  
     # --- Gateway (hindari recovery prematur saat rolling restart) ---
     # TODO: sesuaikan angka dengan jumlah data node aktual di cluster Anda
-    gateway.recover_after_data_nodes: 2
-    gateway.expected_data_nodes: 3
+    gateway.recover_after_data_nodes: 1
+    gateway.expected_data_nodes: 1
     gateway.recover_after_time: 5m
  
     # --- Security plugin: common ---
-    plugins.security.nodes_dn:
-      - "CN=*.opensearch-cluster.opensearch.svc.cluster.local,OU=node,O=MyOrg,L=City,ST=State,C=ID"
-    plugins.security.authcz.admin_dn:
-      - "CN=admin,OU=client,O=MyOrg,L=City,ST=State,C=ID"
-    plugins.security.restapi.roles_enabled:
-      - "all_access"
-      - "security_rest_api_access"
+    plugins.security.disabled: true
+    # plugins.security.nodes_dn:
+    #   - "CN=*.opensearch-cluster.opensearch.svc.cluster.local,OU=node,O=MyOrg,L=City,ST=State,C=ID"
+    # plugins.security.authcz.admin_dn:
+    #   - "CN=admin,OU=client,O=MyOrg,L=City,ST=State,C=ID"
+    # plugins.security.restapi.roles_enabled:
+    #   - "all_access"
+    #   - "security_rest_api_access"
  
     # --- TLS transport layer (wajib aktif untuk inter-node auth) ---
-    transport.ssl.enforce_hostname_verification: true
-    transport.ssl.resolve_hostname: true
-    plugins.security.ssl.transport.enabled: true
-    plugins.security.ssl.transport.pemcert_filepath: certs/esnode.pem
-    plugins.security.ssl.transport.pemkey_filepath: certs/esnode-key.pem
-    plugins.security.ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
+    # transport.ssl.enforce_hostname_verification: true
+    # transport.ssl.resolve_hostname: true
+    # plugins.security.ssl.transport.enabled: true
+    # plugins.security.ssl.transport.pemcert_filepath: certs/esnode.pem
+    # plugins.security.ssl.transport.pemkey_filepath: certs/esnode-key.pem
+    # plugins.security.ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
  
     # --- TLS REST layer ---
-    plugins.security.ssl.http.enabled: true
-    plugins.security.ssl.http.clientauth_mode: OPTIONAL
-    plugins.security.ssl.http.pemcert_filepath: certs/esnode.pem
-    plugins.security.ssl.http.pemkey_filepath: certs/esnode-key.pem
-    plugins.security.ssl.http.pemtrustedcas_filepath: certs/root-ca.pem
+    # plugins.security.ssl.http.enabled: true
+    # plugins.security.ssl.http.clientauth_mode: OPTIONAL
+    # plugins.security.ssl.http.pemcert_filepath: certs/esnode.pem
+    # plugins.security.ssl.http.pemkey_filepath: certs/esnode-key.pem
+    # plugins.security.ssl.http.pemtrustedcas_filepath: certs/root-ca.pem
  
     # =========================================================
     # OPSIONAL — nonaktif secara default, aktifkan sesuai kebutuhan.

@@ -11,7 +11,7 @@ kubectl wait --for=condition=ready pod -l app=postgres -n rdbms --timeout=60s
 kubectl apply -f minio.yaml -n minio
 kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
 kubectl apply -f minio_initiate_task.yaml -n minio
-@REM kubectl logs -n oss job/minio-bucket-init   
+@REM kubectl logs -n minio job/minio-bucket-init   
 
 kubectl apply -f airflow_secret.yaml -n airflow
 kubectl apply -f airflow_rbac.yaml -n airflow
@@ -23,8 +23,12 @@ kubectl apply -f airflow.yaml -n airflow
 
 kubectl apply -f lldap.yaml -n lldap
 
+kubectl apply -f opensearch_secret.yaml -n opensearch
+kubectl apply -f opensearch_configmap_common.yaml -n opensearch
+kubectl apply -f opensearch.yaml -n opensearch
+
 @REM kubectl port-forward -n rdbms svc/postgres 5432:5432
-@REM kubectl port-forward -n oss svc/minio 9001:9001
+@REM kubectl port-forward -n minio svc/minio 9001:9001
 @REM kubectl port-forward -n airflow svc/airflow-api-server 8080:8080
 @REM kubectl port-forward -n lldap svc/lldap 17170:17170
 
@@ -32,6 +36,9 @@ kubectl apply -f lldap.yaml -n lldap
 kubectl logs -n airflow deployment.apps/airflow-scheduler
 kubectl logs -n lldap deployment.apps/lldap
 kubectl logs -n ranger deployment.apps/ranger-admin
+kubectl logs -n opensearch statefulset.apps/opensearch-cluster-manager
+kubectl logs -n opensearch statefulset.apps/opensearch-data
+kubectl logs -n opensearch statefulset.apps/opensearch-coordinator
 
 
 docker create --name ranger-temp apache/ranger:2.8.0

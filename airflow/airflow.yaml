@@ -95,7 +95,7 @@ metadata:
   namespace: airflow
 data:
   AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
-  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: /opt/airflow/pod_templates/pod_template_file.yaml
+  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: /opt/airflow/pod_templates/airflow_worker.yaml
 
 ---
 apiVersion: apps/v1

@@ -1,0 +1,463 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-config-manager
+  namespace: opensearch
+data:
+  manager.yml: |
+    node.roles: ["cluster_manager"]
+    cluster.initial_cluster_manager_nodes:
+      - opensearch-cluster-manager-0
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-cluster-manager
+  namespace: opensearch
+spec:
+  serviceName: opensearch-cluster-manager-headless
+  replicas: 1
+  podManagementPolicy: OrderedReady 
+  selector:
+    matchLabels:
+      app: opensearch-cluster-manager
+  volumeClaimTemplates:
+  - metadata:
+      name: opensearch-cluster-manager-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: "4Gi"
+  template:
+    metadata:
+      labels:
+        app: opensearch-cluster-manager
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 120
+      initContainers:
+      - name: config-file-manager
+        image: "opensearchproject/opensearch:3.7.0"
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "cat /tmp/configfolder/common.yml /tmp/configfolder/manager.yml > /usr/share/opensearch/config/opensearch.yml"]
+        volumeMounts:
+        - name: opensearch-config-common
+          mountPath: /tmp/configfolder/common.yml
+          subPath: common.yml
+        - name: opensearch-config-manager
+          mountPath: /tmp/configfolder/manager.yml
+          subPath: manager.yml
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config
+      containers:
+      - name: opensearch-cluster-manager
+        image: "opensearchproject/opensearch:3.7.0"
+        # imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+        envFrom:
+          - secretRef:
+              name: opensearch-secret
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        - name: metrics
+          containerPort: 9600
+        volumeMounts:
+        - name: opensearch-cluster-manager-pvc
+          mountPath: /usr/share/opensearch/data
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config/opensearch.yml
+          subPath: opensearch.yml
+        startupProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+      volumes:
+      - name: opensearch-config-manager
+        configMap:
+          name: opensearch-config-manager
+          defaultMode: 0755
+      - name: opensearch-config-common
+        configMap:
+          name: opensearch-config-common
+          defaultMode: 0755
+      - name: config-emptydir
+        emptyDir: {}
+
+---
+# === Service (ClusterIP) untuk akses ke master node ===
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-cluster-manager
+  namespace: opensearch
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch-cluster-manager
+  ports:
+  - name: http
+    port: 9200
+    targetPort: 9200
+  - name: transport
+    port: 9300
+    targetPort: 9300
+  - name: metrics
+    port: 9600
+    targetPort: 9600
+
+---
+# === Headless Service: wajib ada, dipakai StatefulSet dan sebagai
+#     titik "seed_hosts" untuk discovery oleh node data & coordinator ===
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-cluster-manager-headless
+  namespace: opensearch
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: opensearch-cluster-manager
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-config-data
+  namespace: opensearch
+data:
+  data.yml: |
+    node.roles: ["data"]
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-data
+  namespace: opensearch
+spec:
+  serviceName: opensearch-data-headless
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: opensearch-data
+  volumeClaimTemplates:
+  - metadata:
+      name: opensearch-data-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: "8Gi"   # sesuaikan dengan estimasi volume data
+  template:
+    metadata:
+      labels:
+        app: opensearch-data
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 120
+      initContainers:
+      - name: config-file-data
+        image: "opensearchproject/opensearch:3.7.0"
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "cat /tmp/configfolder/common.yml /tmp/configfolder/data.yml > /usr/share/opensearch/config/opensearch.yml"]
+        volumeMounts:
+        - name: opensearch-config-common
+          mountPath: /tmp/configfolder/common.yml
+          subPath: common.yml
+        - name: opensearch-config-data
+          mountPath: /tmp/configfolder/data.yml
+          subPath: data.yml
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config
+      containers:
+      - name: opensearch-data
+        image: "opensearchproject/opensearch:3.7.0"
+        # imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        - name: metrics
+          containerPort: 9600
+        volumeMounts:
+        - name: opensearch-data-pvc
+          mountPath: /usr/share/opensearch/data
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config/opensearch.yml
+          subPath: opensearch.yml
+        startupProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+      volumes:
+      - name: opensearch-config-data
+        configMap:
+          name: opensearch-config-data
+          defaultMode: 0755
+      - name: opensearch-config-common
+        configMap:
+          name: opensearch-config-common
+          defaultMode: 0755
+      - name: config-emptydir
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-data
+  namespace: opensearch
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch-data
+  ports:
+  - name: http
+    port: 9200
+    targetPort: 9200
+  - name: transport
+    port: 9300
+    targetPort: 9300
+  - name: metrics
+    port: 9600
+    targetPort: 9600
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-data-headless
+  namespace: opensearch
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: opensearch-data
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-config-coordinator
+  namespace: opensearch
+data:
+  coordinator.yml: |
+    node.roles: []
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-coordinator
+  namespace: opensearch
+spec:
+  serviceName: opensearch-coordinator-headless
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: opensearch-coordinator
+  template:
+    metadata:
+      labels:
+        app: opensearch-coordinator
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 120
+      initContainers:
+      - name: config-file-coordinator
+        image: "opensearchproject/opensearch:3.7.0"
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "cat /tmp/configfolder/common.yml /tmp/configfolder/coordinator.yml > /usr/share/opensearch/config/opensearch.yml"]
+        volumeMounts:
+        - name: opensearch-config-common
+          mountPath: /tmp/configfolder/common.yml
+          subPath: common.yml
+        - name: opensearch-config-coordinator
+          mountPath: /tmp/configfolder/coordinator.yml
+          subPath: coordinator.yml
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config
+      containers:
+      - name: opensearch-coordinator
+        image: "opensearchproject/opensearch:3.7.0"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        - name: metrics
+          containerPort: 9600
+        volumeMounts:
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config/opensearch.yml
+          subPath: opensearch.yml
+        startupProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 30
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+      volumes:
+      - name: opensearch-config-coordinator
+        configMap:
+          name: opensearch-config-coordinator
+          defaultMode: 0755
+      - name: opensearch-config-common
+        configMap:
+          name: opensearch-config-common
+          defaultMode: 0755
+      - name: config-emptydir
+        emptyDir: {}
+
+---
+# Service ini yang paling cocok dijadikan entry point untuk client/Dashboards
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-coordinator
+  namespace: opensearch
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch-coordinator
+  ports:
+  - name: http
+    port: 9200
+    targetPort: 9200
+  - name: transport
+    port: 9300
+    targetPort: 9300
+  - name: metrics
+    port: 9600
+    targetPort: 9600
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-coordinator-headless
+  namespace: opensearch
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: opensearch-coordinator
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600

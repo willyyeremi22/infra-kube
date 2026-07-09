@@ -16,7 +16,7 @@ metadata:
   name: airflow-worker-pod-template
   namespace: airflow
 data:
-  pod_template_file.yaml: |
+  airflow_worker.yaml: |
     apiVersion: v1
     kind: Pod
     metadata:
