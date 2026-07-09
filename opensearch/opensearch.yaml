@@ -469,7 +469,7 @@ metadata:
   name: opensearch-config-dashboard
   namespace: opensearch
 data:
-  dashboard.yml: |
+  opensearch_dashboards.yml: |
     server.host: "0.0.0.0"
     opensearch.hosts:
       - http://opensearch-coordinator.opensearch.svc.cluster.local:9200
@@ -487,7 +487,6 @@ metadata:
   namespace: opensearch
 spec:
   replicas: 1
-  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
       app: opensearch-dashboard
@@ -496,30 +495,17 @@ spec:
       labels:
         app: opensearch-dashboard
     spec:
-      initContainers:
-      - name: config-file-dashboard
-        image: "opensearchproject/opensearch-dashboards:3.7.0"
-        imagePullPolicy: IfNotPresent
-        command: ["sh", "-c", "cat /tmp/configfolder/common.yml /tmp/configfolder/dashboard.yml > /usr/share/opensearch-dashboards/config/opensearch.yml"]
-        volumeMounts:
-        - name: opensearch-config-common
-          mountPath: /tmp/configfolder/common.yml
-          subPath: common.yml
-        - name: opensearch-config-dashboard
-          mountPath: /tmp/configfolder/dashboard.yml
-          subPath: dashboard.yml
-        - name: config-emptydir
-          mountPath: /usr/share/opensearch-dashboards/config
       containers:
       - name: opensearch-dashboard
         image: "opensearchproject/opensearch-dashboards:3.7.0"
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5601
+        - name: http
+          containerPort: 5601
         volumeMounts:
-        - name: config-emptydir
-          mountPath: /usr/share/opensearch-dashboards/config/opensearch.yml
-          subPath: opensearch.yml
+        - name: opensearch-config-dashboard
+          mountPath: /usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+          subPath: opensearch_dashboards.yml
         startupProbe:
           httpGet:
             path: /
@@ -534,22 +520,15 @@ spec:
             port: 5601
         resources:
           requests:
-            cpu: "500m"
-            memory: "256Mi"
+            cpu: "250m"
+            memory: "512Mi"
           limits:
             cpu: "1"
-            memory: "256Mi"
+            memory: "1Gi"
       volumes:
       - name: opensearch-config-dashboard
         configMap:
           name: opensearch-config-dashboard
-          defaultMode: 0755
-      - name: opensearch-config-common
-        configMap:
-          name: opensearch-config-common
-          defaultMode: 0755
-      - name: config-emptydir
-        emptyDir: {}
 
 ---
 # Service ini yang paling cocok dijadikan entry point untuk client/Dashboards
@@ -563,5 +542,6 @@ spec:
   selector:
     app: opensearch-dashboard
   ports:
-  - port: 5601
+  - name: http
+    port: 5601
     targetPort: 5601
