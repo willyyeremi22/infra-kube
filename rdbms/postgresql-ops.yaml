@@ -1,0 +1,138 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-ops-secret
+  namespace: rdbms
+type: Opaque
+stringData:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  AIRFLOW_DB: airflow
+  AIRFLOW_USER: airflow
+  AIRFLOW_PASSWORD: airflow
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-ops-initiate-command
+  namespace: rdbms
+data:
+  initiate_db.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    create_user_and_db() {
+      local database="$1"
+      local username="$2"
+      local password="$3"
+
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+        DO \$\$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT FROM pg_catalog.pg_roles WHERE rolname = '$username'
+          ) THEN
+            CREATE ROLE $username LOGIN PASSWORD '$password';
+          END IF;
+        END
+        \$\$;
+
+        SELECT 'CREATE DATABASE $database OWNER $username'
+        WHERE NOT EXISTS (
+          SELECT FROM pg_database WHERE datname = '$database'
+        )\gexec
+
+        GRANT ALL PRIVILEGES ON DATABASE $database TO $username;
+    EOSQL
+    }
+
+    create_user_and_db "$AIRFLOW_DB" "$AIRFLOW_USER" "$AIRFLOW_PASSWORD"
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-ops
+  namespace: rdbms
+spec:
+  serviceName: postgres-ops-headless
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  selector:
+    matchLabels:
+      app: postgres-ops
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-ops-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: "1Gi"
+  template:
+    metadata:
+      labels:
+        app: postgres-ops
+    spec:
+      containers:
+      - name: postgres-ops
+        image: "postgres:18"
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - secretRef:
+              name: postgres-ops-secret
+        ports:
+          - name: tcp
+            containerPort: 5432
+        volumeMounts:
+          - name: postgres-ops-pvc
+            mountPath: /var/lib/postgresql
+          - name: postgres-ops-initiate-command
+            mountPath: /docker-entrypoint-initdb.d/initiate_db.sh
+            subPath: initiate_db.sh
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+        - name: postgres-ops-initiate-command
+          configMap:
+            name: postgres-ops-initiate-command
+            defaultMode: 0755
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ops
+  namespace: rdbms
+spec:
+  selector:
+    app: postgres-ops
+  ports:
+    - name: tcp
+      port: 5432
+      targetPort: 5432
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ops-headless
+  namespace: rdbms
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: postgres-ops
+  ports:
+    - name: tcp
+      port: 5432

@@ -5,7 +5,8 @@ docker build -f dockerfile.ranger_usersync -t apache/ranger-custom-usersync:2.8.
 
 kubectl apply -f namespace.yaml
 
-kubectl apply -f postgresql.yaml -n rdbms
+kubectl apply -f ./rdbms/postgresql-metadata.yaml -n rdbms
+kubectl apply -f ./rdbms/postgresql-ops.yaml -n rdbms
 kubectl wait --for=condition=ready pod -l app=postgres -n rdbms --timeout=60s
 
 kubectl apply -f minio.yaml -n minio
@@ -27,13 +28,16 @@ kubectl apply -f opensearch_secret.yaml -n opensearch
 kubectl apply -f opensearch_configmap_common.yaml -n opensearch
 kubectl apply -f opensearch.yaml -n opensearch
 
-@REM kubectl port-forward -n rdbms svc/postgres 5432:5432
+@REM kubectl port-forward -n rdbms svc/postgres-metadata 5432:5432
+@REM kubectl port-forward -n rdbms svc/postgres-ops 5431:5432
 @REM kubectl port-forward -n minio svc/minio 9001:9001
 @REM kubectl port-forward -n airflow svc/airflow-api-server 8080:8080
 @REM kubectl port-forward -n lldap svc/lldap 17170:17170
 @REM kubectl port-forward -n opensearch svc/opensearch-dashboard 5601:5601
 
 
+kubectl logs -n rdbms statefulset.apps/postgres-metadata
+kubectl logs -n rdbms statefulset.apps/postgres-ops
 kubectl logs -n airflow deployment.apps/airflow-scheduler
 kubectl logs -n lldap deployment.apps/lldap
 kubectl logs -n ranger deployment.apps/ranger-admin

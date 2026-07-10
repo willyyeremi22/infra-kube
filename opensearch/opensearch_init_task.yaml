@@ -29,9 +29,7 @@ data:
     # Wait OpenSearch
     ##############################################
 
-    until curl -s \
-      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
-      "$HOST/_cluster/health" >/dev/null
+    until curl -s -u "$ADMIN_USER:$ADMIN_PASSWORD" "$HOST/_cluster/health" >/dev/null
     do
       sleep 5
     done
@@ -40,31 +38,16 @@ data:
     # Cluster Health
     ##############################################
 
-    until STATUS=$(
-      curl -s \
-      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
-      "$HOST/_cluster/health" \
-      | grep -o '"status":"[^"]*"' \
-      | cut -d'"' -f4
-    )
+    until STATUS=$(curl -s -u "$ADMIN_USER:$ADMIN_PASSWORD" "$HOST/_cluster/health" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
     do
       sleep 2
     done
-
-    echo "Cluster Status = $STATUS"
 
     ##############################################
     # Ranger Role
     ##############################################
 
-    echo "Creating Role..."
-
-    curl -s \
-      -X PUT \
-      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
-      "$HOST/_plugins/_security/api/roles/ranger_audit_role" \
-      -H "Content-Type: application/json" \
-      -d '
+    curl -s -X PUT -u "$ADMIN_USER:$ADMIN_PASSWORD" "$HOST/_plugins/_security/api/roles/ranger_audit_role" -H "Content-Type: application/json" -d '
     {
       "cluster_permissions":[
         "cluster_composite_ops"
@@ -86,14 +69,7 @@ data:
     # Ranger User
     ##############################################
 
-    echo "Creating User..."
-
-    curl -s \
-      -X PUT \
-      -u "$ADMIN_USER:$ADMIN_PASSWORD" \
-      "$HOST/_plugins/_security/api/internalusers/$RANGER_USER" \
-      -H "Content-Type: application/json" \
-      -d "
+    curl -s -X PUT -u "$ADMIN_USER:$ADMIN_PASSWORD" "$HOST/_plugins/_security/api/internalusers/$RANGER_USER" -H "Content-Type: application/json" -d "
     {
       \"password\":\"$RANGER_PASSWORD\"
     }"
@@ -101,8 +77,6 @@ data:
     ##############################################
     # Role Mapping
     ##############################################
-
-    echo "Creating Role Mapping..."
 
     curl -s \
       -X PUT \
@@ -119,8 +93,6 @@ data:
     ##############################################
     # ISM Policy
     ##############################################
-
-    echo "Creating ISM Policy..."
 
     curl -s \
       -X PUT \
@@ -162,8 +134,6 @@ data:
     # Index Template
     ##############################################
 
-    echo "Creating Index Template..."
-
     curl -s \
       -X PUT \
       -u "$ADMIN_USER:$ADMIN_PASSWORD" \
@@ -188,17 +158,12 @@ data:
     # First Index
     ##############################################
 
-    echo "Checking First Index..."
-
     HTTP_CODE=$(curl -s -o /dev/null \
       -w "%{http_code}" \
       -u "$ADMIN_USER:$ADMIN_PASSWORD" \
       "$HOST/ranger_audits-000001")
 
     if [ "$HTTP_CODE" = "404" ]; then
-
-      echo "Creating First Index..."
-
       curl -s \
         -X PUT \
         -u "$ADMIN_USER:$ADMIN_PASSWORD" \
@@ -212,18 +177,58 @@ data:
           }
         }
       }'
-
     else
-
       echo "Index already exists."
-
     fi
 
-    ##############################################
-    # Finish
-    ##############################################
-
-    echo ""
-    echo "===================================="
-    echo " Bootstrap Finished"
-    echo "===================================="
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: opensearch-bootstrap
+  namespace: opensearch
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: opensearch-bootstrap
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: bootstrap
+          image: curlimages/curl:8.16.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - /bootstrap/bootstrap.sh
+          env:
+            - name: ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: opensearch-bootstrap-secret
+                  key: ADMIN_USER
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opensearch-bootstrap-secret
+                  key: ADMIN_PASSWORD
+            - name: RANGER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: opensearch-bootstrap-secret
+                  key: RANGER_USER
+            - name: RANGER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opensearch-bootstrap-secret
+                  key: RANGER_PASSWORD
+          volumeMounts:
+            - name: bootstrap-script
+              mountPath: /bootstrap
+      volumes:
+        - name: bootstrap-script
+          configMap:
+            name: opensearch-bootstrap-script
+            defaultMode: 0755

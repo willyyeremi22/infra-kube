@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: postgres-secret
+  name: postgres-metadata-secret
   namespace: rdbms
 type: Opaque
 stringData:
@@ -25,7 +25,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-initiate-command
+  name: postgres-metadata-initiate-command
   namespace: rdbms
 data:
   initiate_db.sh: |
@@ -63,77 +63,88 @@ data:
     create_user_and_db "$LLDAP_DB" "$LLDAP_USER" "$LLDAP_PASSWORD"
 
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-  namespace: rdbms
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-
----
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: postgres
+  name: postgres-metadata
   namespace: rdbms
 spec:
+  serviceName: postgres-metadata-headless
   replicas: 1
+  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
-      app: postgres
+      app: postgres-metadata
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-metadata-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: "1Gi"
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgres-metadata
     spec:
       containers:
-        - name: postgres
-          image: postgres:18
-          imagePullPolicy: IfNotPresent
-          envFrom:
-            - secretRef:
-                name: postgres-secret
-          ports:
-            - containerPort: 5432
-          volumeMounts:
-            - name: postgres-data
-              mountPath: /var/lib/postgresql
-            - name: postgres-initiate-command
-              mountPath: /docker-entrypoint-initdb.d/initiate_db.sh
-              subPath: initiate_db.sh
-          readinessProbe:
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 30
-            periodSeconds: 10
+      - name: postgres-metadata
+        image: "postgres:18"
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - secretRef:
+              name: postgres-metadata-secret
+        ports:
+          - name: tcp
+            containerPort: 5432
+        volumeMounts:
+          - name: postgres-metadata-pvc
+            mountPath: /var/lib/postgresql
+          - name: postgres-metadata-initiate-command
+            mountPath: /docker-entrypoint-initdb.d/initiate_db.sh
+            subPath: initiate_db.sh
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
       volumes:
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: postgres-pvc
-        - name: postgres-initiate-command
+        - name: postgres-metadata-initiate-command
           configMap:
-            name: postgres-initiate-command
+            name: postgres-metadata-initiate-command
             defaultMode: 0755
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: postgres-metadata
   namespace: rdbms
 spec:
   selector:
-    app: postgres
+    app: postgres-metadata
   ports:
-    - port: 5432
+    - name: tcp
+      port: 5432
       targetPort: 5432
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-metadata-headless
+  namespace: rdbms
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: postgres-metadata
+  ports:
+    - name: tcp
+      port: 5432
