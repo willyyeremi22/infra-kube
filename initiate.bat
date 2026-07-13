@@ -22,8 +22,6 @@ kubectl apply -f opensearch.yaml -n opensearch
 
 @REM tier 2
 
-kubectl apply -f ./lldap/lldap_secret.yaml -n lldap
-kubectl apply -f ./lldap/lldap_configmap_common.yaml -n lldap
 kubectl apply -f ./lldap/lldap.yaml -n lldap
 kubectl wait --for=condition=ready pod -l app=lldap -n lldap --timeout=60s
 kubectl apply -f ./lldap/lldap_initiate_task.yaml -n lldap

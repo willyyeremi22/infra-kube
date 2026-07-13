@@ -110,7 +110,6 @@ metadata:
   name: lldap-init-config
   namespace: lldap
 data:
-  LLDAP_HTTP_URL: http://lldap.lldap.svc.cluster.local:17170
   LLDAP_URL: http://lldap.lldap.svc.cluster.local:17170
   groups.json: |
     {
@@ -199,11 +198,7 @@ spec:
           image: lldap/lldap:2026-05-26
           envFrom:
             - configMapRef:
-                name: lldap-config-common
-            - configMapRef:
                 name: lldap-init-config
-            - secretRef:
-                name: lldap-secret
             - secretRef:
                 name: lldap-init-secret
           command:

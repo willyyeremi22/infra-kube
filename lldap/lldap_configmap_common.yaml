@@ -1,8 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: lldap-config-common
-  namespace: lldap
-data:
-  LLDAP_LDAP_BASE_DN: dc=example,dc=com
