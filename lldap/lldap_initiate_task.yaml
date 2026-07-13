@@ -1,0 +1,244 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: lldap-init-secret
+  namespace: lldap
+type: Opaque
+stringData:
+  LLDAP_ADMIN_USERNAME: admin
+  LLDAP_ADMIN_PASSWORD: "Lldap!123"
+  users.json: |
+    {
+      "users": [
+        {
+          "id": "de1",
+          "email": "de1@example.com",
+          "displayName": "Data Engineer 1",
+          "password": "password",
+          "groups": [
+            "data_engineer",
+            "staff"
+          ]
+        },
+        {
+          "id": "de2",
+          "email": "de2@example.com",
+          "displayName": "Data Engineer 2",
+          "password": "password",
+          "groups": [
+            "data_engineer",
+            "staff"
+          ]
+        },
+        {
+          "id": "de3",
+          "email": "de3@example.com",
+          "displayName": "Data Engineer 3",
+          "password": "password",
+          "groups": [
+            "data_engineer",
+            "staff"
+          ]
+        },
+        {
+          "id": "de4",
+          "email": "de4@example.com",
+          "displayName": "Data Engineer Manager",
+          "password": "password",
+          "groups": [
+            "data_engineer",
+            "manager"
+          ]
+        },
+        {
+          "id": "da1",
+          "email": "da1@example.com",
+          "displayName": "Data Analyst 1",
+          "password": "password",
+          "groups": [
+            "data_analyst",
+            "staff"
+          ]
+        },
+        {
+          "id": "da2",
+          "email": "da2@example.com",
+          "displayName": "Data Analyst 2",
+          "password": "password",
+          "groups": [
+            "data_analyst",
+            "staff"
+          ]
+        },
+        {
+          "id": "da3",
+          "email": "da3@example.com",
+          "displayName": "Data Analyst 3",
+          "password": "password",
+          "groups": [
+            "data_analyst",
+            "staff"
+          ]
+        },
+        {
+          "id": "da4",
+          "email": "da4@example.com",
+          "displayName": "Data Analyst Manager",
+          "password": "password",
+          "groups": [
+            "data_analyst",
+            "manager"
+          ]
+        },
+        {
+          "id": "ranger_service",
+          "email": "ranger_service@example.com",
+          "displayName": "Ranger Service",
+          "password": "password",
+          "groups": [
+            "ranger_service"
+          ]
+        }
+      ]
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lldap-init-config
+  namespace: lldap
+data:
+  LLDAP_HTTP_URL: http://lldap.lldap.svc.cluster.local:17170
+  LLDAP_URL: http://lldap.lldap.svc.cluster.local:17170
+  groups.json: |
+    {
+      "groups": [
+        {
+          "name": "data_engineer"
+        },
+        {
+          "name": "data_analyst"
+        },
+        {
+          "name": "manager"
+        },
+        {
+          "name": "staff"
+        },
+        {
+          "name": "ranger_service"
+        }
+      ]
+    }
+  generate_data.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    BOOTSTRAP_DIR=/bootstrap
+
+    GROUPS_JSON="$BOOTSTRAP_DIR/groups.json"
+    USERS_JSON="$BOOTSTRAP_DIR/users.json"
+
+    GROUP_CONFIG_DIR="$BOOTSTRAP_DIR/group-configs"
+    USER_CONFIG_DIR="$BOOTSTRAP_DIR/user-configs"
+
+    mkdir -p "$GROUP_CONFIG_DIR"
+    mkdir -p "$USER_CONFIG_DIR"
+    mkdir -p "$BOOTSTRAP_DIR/group-schemas"
+    mkdir -p "$BOOTSTRAP_DIR/user-schemas"
+
+    rm -f "$GROUP_CONFIG_DIR"/*.json
+    rm -f "$USER_CONFIG_DIR"/*.json
+
+    echo "Generate groups..."
+
+    jq -c '.groups[]' "$GROUPS_JSON" |
+    while read -r group
+    do
+        name=$(echo "$group" | jq -r '.name')
+
+        echo "$group" | jq . > "$GROUP_CONFIG_DIR/${name}.json"
+
+        echo "created group-configs/${name}.json"
+    done
+
+    echo
+    echo "Generate users..."
+
+    jq -c '.users[]' "$USERS_JSON" |
+    while read -r user
+    do
+        id=$(echo "$user" | jq -r '.id')
+
+        echo "$user" | jq . > "$USER_CONFIG_DIR/${id}.json"
+
+        echo "created user-configs/${id}.json"
+    done
+
+    echo
+    echo "Done."
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lldap-init
+  namespace: lldap
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: lldap-init
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: lldap-init
+          image: lldap/lldap:2026-05-26
+          envFrom:
+            - configMapRef:
+                name: lldap-config-common
+            - configMapRef:
+                name: lldap-init-config
+            - secretRef:
+                name: lldap-secret
+            - secretRef:
+                name: lldap-init-secret
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - |
+              set -e
+              cd /bootstrap
+              ./generate_data.sh
+              exec /app/bootstrap.sh
+          volumeMounts:
+            - name: lldap-init-secret
+              mountPath: /bootstrap/users.json
+              subPath: users.json
+            - name: lldap-init-config
+              mountPath: /bootstrap/groups.json
+              subPath: groups.json
+            - name: lldap-init-config
+              mountPath: /bootstrap/generate_data.sh
+              subPath: generate_data.sh
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+      volumes:
+        - name: lldap-init-config
+          configMap:
+            name: lldap-init-config
+            defaultMode: 0755
+        - name: lldap-init-secret
+          secret:
+            secretName: lldap-init-secret
+            defaultMode: 0755
+

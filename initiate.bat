@@ -11,9 +11,9 @@ kubectl apply -f ./rdbms/postgresql-metadata.yaml -n rdbms
 kubectl apply -f ./rdbms/postgresql-ops.yaml -n rdbms
 kubectl wait --for=condition=ready pod -l app=postgres -n rdbms --timeout=60s
 
-kubectl apply -f minio.yaml -n minio
+kubectl apply -f ./minio/minio.yaml -n minio
 kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
-kubectl apply -f minio_initiate_task.yaml -n minio
+kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
 @REM kubectl logs -n minio job/minio-bucket-init   
 
 kubectl apply -f opensearch_secret.yaml -n opensearch
@@ -22,7 +22,12 @@ kubectl apply -f opensearch.yaml -n opensearch
 
 @REM tier 2
 
+kubectl apply -f ./lldap/lldap_secret.yaml -n lldap
+kubectl apply -f ./lldap/lldap_configmap_common.yaml -n lldap
 kubectl apply -f ./lldap/lldap.yaml -n lldap
+kubectl wait --for=condition=ready pod -l app=lldap -n lldap --timeout=60s
+kubectl apply -f ./lldap/lldap_initiate_task.yaml -n lldap
+@REM kubectl logs -n lldap job.batch/lldap-init
 
 kubectl apply -f airflow_secret.yaml -n airflow
 kubectl apply -f airflow_rbac.yaml -n airflow
@@ -53,6 +58,13 @@ kubectl logs -n opensearch statefulset.apps/opensearch-data
 kubectl logs -n opensearch statefulset.apps/opensearch-coordinator
 kubectl logs -n opensearch deployment.apps/opensearch-dashboard
 
+kubectl describe pod lldap-init-tdn8j -n lldap   
+
+kubectl exec -it -n lldap lldap-init-tfw7s -- /bin/bash
+
+kubectl exec -it -n lldap lldap-init-l59px -- /bin/bash
+
+
 docker create --name ranger-temp apache/ranger:2.8.0
 
 docker create --name ranger-temp apache/ranger-base:20260123-2-17    
@@ -66,6 +78,8 @@ docker cp ranger-temp:opt/ranger/admin/ews/ranger-admin-services.sh .
 docker cp ranger-temp:/home/ranger/scripts/create-ranger-services.py .
 
 docker cp ranger-temp:opt/ranger/admin/install.properties .
+
+docker cp ranger-temp:/home/ranger/scripts/download-ranger.sh .
 
 docker cp ranger-temp:/home/ranger/scripts/download-ranger.sh .
 
@@ -88,3 +102,5 @@ docker run --rm -v ${PWD}:/work alpine/helm:3.18.6 template opensearch /work/cha
 docker run --rm -v "${PWD}:/chart" -w /chart alpine/helm:3.18.6 template opensearch . > rendered.yaml
 
 docker run --rm -v "%cd%:/chart" -w /chart alpine/helm:3.18.6 template opensearch . > rendered.yaml
+
+docker run --rm --entrypoint /bin/bash lldap/lldap:2026-05-26 -c 'cat /app/bootstrap.sh'

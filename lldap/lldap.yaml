@@ -1,147 +1,11 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: lldap-secret
-  namespace: lldap
-type: Opaque
-stringData:
-  LLDAP_JWT_SECRET: "REPLACE_WITH_RANDOM"
-  LLDAP_KEY_SEED: "REPLACE_WITH_RANDOM"
-  LLDAP_LDAP_USER_DN: admin
-  LLDAP_LDAP_USER_PASS: "Lldap!123"
-  LLDAP_DATABASE_URL: postgres://lldap:lldap@postgres-metadata.rdbms.svc.cluster.local:5432/lldap
-
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: lldap-config_variable
+  name: lldap-config
   namespace: lldap
 data:
   LLDAP_HTTP_URL: http://localhost:17170
-  LLDAP_LDAP_BASE_DN: dc=example,dc=com
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: lldap-config_variable
-  namespace: lldap
-data:
-  groups.yaml: |
-    groups:
-      - data_engineer
-      - data_analyst
-      - manager
-      - staff
-      - ranger_service
-  users.yaml: |
-    users:
-      - id: de1
-        email: de1@example.com
-        displayName: Data Engineer 1
-        password: password
-        groups:
-          - data_engineer
-          - staff
-      - id: de2
-        email: de2@example.com
-        displayName: Data Engineer 2
-        password: password
-        groups:
-          - data_engineer
-          - staff
-      - id: de3
-        email: de3@example.com
-        displayName: Data Engineer 3
-        password: password
-        groups:
-          - data_engineer
-          - staff
-      - id: de4
-        email: de4@example.com
-        displayName: Data Engineer Manager
-        password: password
-        groups:
-          - data_engineer
-          - manager
-      - id: da1
-        email: da1@example.com
-        displayName: Data Analyst 1
-        password: password
-        groups:
-          - data_analyst
-          - staff
-      - id: da2
-        email: da2@example.com
-        displayName: Data Analyst 2
-        password: password
-        groups:
-          - data_analyst
-          - staff
-      - id: da3
-        email: da3@example.com
-        displayName: Data Analyst 3
-        password: password
-        groups:
-          - data_analyst
-          - staff
-      - id: da4
-        email: da4@example.com
-        displayName: Data Analyst Manager
-        password: password
-        groups:
-          - data_analyst
-          - manager
-      - id: ranger_service
-        email: ranger_service4@example.com
-        displayName: Ranger Service
-        password: password
-        groups:
-          - ranger_service
-  generate_data.sh: |
-    #!/usr/bin/env bash
-    set -e
-
-    mkdir -p group-configs
-    mkdir -p user-configs
-
-    rm -f group-configs/*.json
-    rm -f user-configs/*.json
-
-    echo "Generate groups..."
-
-    yq -o=json '.groups[]' groups.yaml |
-    jq -r '
-    {
-        name: .
-    }
-    | @base64
-    ' |
-    while read row
-    do
-        obj=$(echo "$row" | base64 -d)
-
-        name=$(echo "$obj" | jq -r '.name')
-
-        echo "$obj" | jq . > group-configs/${name}.json
-
-        echo "created group-configs/${name}.json"
-    done
-
-    echo
-    echo "Generate users..."
-
-    yq -o=json '.users[]' users.yaml |
-    jq -c '.' |
-    while read user
-    do
-        id=$(echo "$user" | jq -r '.id')
-
-        echo "$user" | jq . > user-configs/${id}.json
-
-        echo "created user-configs/${id}.json"
-    done
 
 ---
 # apiVersion: v1
@@ -177,11 +41,13 @@ spec:
         image: lldap/lldap:2026-05-26
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3890
-          name: ldap
-        - containerPort: 17170
-          name: web
+        - name: ldap
+          containerPort: 3890
+        - name: web
+          containerPort: 17170
         envFrom:
+          - configMapRef:
+              name: lldap-config-common
           - configMapRef:
               name: lldap-config
           - secretRef:
