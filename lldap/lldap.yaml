@@ -103,7 +103,7 @@ spec:
     app: lldap
   ports:
   - name: ldap
-    port: 389
+    port: 3890
     targetPort: 3890
   - name: web
     port: 17170

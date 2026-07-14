@@ -121,13 +121,13 @@ ENV hadoop_conf="/etc/hadoop/conf"
 ENV sso_enabled="false"
 ENV sso_providerurl="https://127.0.0.1:8443/gateway/knoxsso/api/v1/websso"
 ENV sso_publickey=""
-ENV RANGER_ADMIN_LOG_DIR="$PWD"
+ENV RANGER_ADMIN_LOG_DIR="/usr/lib/ranger/ranger--admin"
 ENV RANGER_ADMIN_LOGBACK_CONF_FILE=""
 ENV RANGER_PID_DIR_PATH="/var/run/ranger"
-ENV XAPOLICYMGR_DIR="$PWD"
-ENV app_home="$PWD/ews/webapp"
-ENV TMPFILE="$PWD/.fi_tmp"
-ENV LOGFILE="$PWD/logfile"
+ENV XAPOLICYMGR_DIR="/usr/lib/ranger/ranger--admin"
+ENV app_home="/usr/lib/ranger/ranger--admin/ews/webapp"
+ENV TMPFILE="/usr/lib/ranger/ranger--admin/.fi_tmp"
+ENV LOGFILE="/usr/lib/ranger/ranger--admin/logfile"
 ENV LOGFILES=""$LOGFILE""
 ENV JAVA_BIN="'java'"
 ENV JAVA_VERSION_REQUIRED="'1.8'"
@@ -285,7 +285,8 @@ EXPOSE 6080
 
 WORKDIR ${RANGER_HOME}
 
-RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY <<'EOF' /usr/lib/ranger/ranger--admin/entrypoint.sh
 #!/usr/bin/env bash
