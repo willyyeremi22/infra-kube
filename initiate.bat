@@ -50,6 +50,7 @@ kubectl apply -f ./ranger/ranger.yaml -n ranger
 @REM kubectl port-forward -n opensearch svc/opensearch-dashboard 5601:5601
 @REM kubectl port-forward -n lldap svc/lldap 17170:17170
 @REM kubectl port-forward -n airflow svc/airflow-api-server 8080:8080
+@REM kubectl port-forward -n ranger svc/ranger-admin 6080:6080
 
 
 
@@ -101,6 +102,9 @@ docker run --rm --entrypoint /bin/bash apache/ranger-custom-usersync:2.8.0 -c 'l
 
 docker run --rm --entrypoint /bin/bash apache/ranger-custom-usersync:2.8.0 -c 'cat /usr/lib/ranger/ranger--usersync/install.properties'
 
+docker run --rm --entrypoint /bin/bash apache/ranger-custom-admin:2.8.0 -c 'cat -A /usr/lib/ranger/ranger--admin/entrypoint.sh'
+docker cp focused_jennings:/usr/lib/ranger/ranger--admin/setup.sh .
+
 
 docker run --rm -v ${PWD}:/work alpine/helm:3.18.6 template opensearch /work/charts/opensearch > rendered.yaml
 
@@ -109,3 +113,7 @@ docker run --rm -v "${PWD}:/chart" -w /chart alpine/helm:3.18.6 template opensea
 docker run --rm -v "%cd%:/chart" -w /chart alpine/helm:3.18.6 template opensearch . > rendered.yaml
 
 docker run --rm --entrypoint /bin/bash lldap/lldap:2026-05-26 -c 'cat /app/bootstrap.sh'
+
+
+kubectl get pod ranger-admin-85b86fb99d-g7zf5 -n ranger -o jsonpath='{.status.containerStatuses[0].imageID}'
+docker image inspect apache/ranger-custom-admin:2.8.0 --format='{{.Id}}'
