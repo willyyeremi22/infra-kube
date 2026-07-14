@@ -11,12 +11,275 @@ RUN mkdir -p /usr/share/java && \
     curl -fSL https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/13.2.0.jre11/mssql-jdbc-13.2.0.jre11.jar -o /usr/share/java/sqljdbc4.jar && \
     curl -fSL https://download.oracle.com/otn-pub/otn_software/jdbc/23262/ojdbc11.jar -o /usr/share/java/ojdbc11.jar
 
-RUN mkdir -p ${RANGER_HOME}
-
-RUN curl -fSL https://downloads.apache.org/ranger/${RANGER_VERSION}/services/admin/ranger-${RANGER_VERSION}-admin.tar.gz -o /tmp/ranger-admin.tar.gz
-
-RUN tar -xzf /tmp/ranger-admin.tar.gz --strip-components=1 -C ${RANGER_HOME} && \
+# Get Ranger
+RUN mkdir -p ${RANGER_HOME} && \
+    curl -fSL https://downloads.apache.org/ranger/${RANGER_VERSION}/services/admin/ranger-${RANGER_VERSION}-admin.tar.gz -o /tmp/ranger-admin.tar.gz && \
+    tar -xzf /tmp/ranger-admin.tar.gz --strip-components=1 -C ${RANGER_HOME} && \
     rm -f /tmp/ranger-admin.tar.gz
+
+# ENV defaults
+ENV PYTHON_COMMAND_INVOKER="python3"
+ENV DB_FLAVOR="MYSQL"
+ENV db_root_user="root"
+ENV db_root_password=""
+ENV db_host="localhost"
+ENV db_ssl_enabled="false"
+ENV db_ssl_required="false"
+ENV db_ssl_verifyServerCertificate="false"
+ENV db_ssl_auth_type="2-way"
+ENV javax_net_ssl_keyStore=""
+ENV javax_net_ssl_keyStorePassword=""
+ENV javax_net_ssl_trustStore=""
+ENV javax_net_ssl_trustStorePassword=""
+ENV javax_net_ssl_trustStore_type="jks"
+ENV javax_net_ssl_keyStore_type="jks"
+ENV db_ssl_certificate_file=""
+ENV db_name="ranger"
+ENV db_user="rangeradmin"
+ENV db_password=""
+ENV is_override_db_connection_string="false"
+ENV db_override_connection_string=""
+ENV rangerAdmin_password=""
+ENV rangerTagsync_password=""
+ENV rangerUsersync_password=""
+ENV keyadmin_password=""
+ENV audit_store="solr"
+ENV audit_elasticsearch_urls=""
+ENV audit_elasticsearch_port=""
+ENV audit_elasticsearch_protocol=""
+ENV audit_elasticsearch_user=""
+ENV audit_elasticsearch_password=""
+ENV audit_elasticsearch_index=""
+ENV audit_elasticsearch_bootstrap_enabled="true"
+ENV audit_solr_urls=""
+ENV audit_solr_user=""
+ENV audit_solr_password=""
+ENV audit_solr_zookeepers=""
+ENV audit_solr_collection_name="ranger_audits"
+ENV audit_solr_config_name="ranger_audits"
+ENV audit_solr_configset_location=""
+ENV audit_solr_no_shards="1"
+ENV audit_solr_no_replica="1"
+ENV audit_solr_max_shards_per_node="1"
+ENV audit_solr_acl_user_list_sasl="solr,infra-solr"
+ENV audit_solr_bootstrap_enabled="true"
+ENV audit_cloudwatch_region=""
+ENV audit_cloudwatch_log_group=""
+ENV audit_cloudwatch_log_stream_prefix=""
+ENV policymgr_external_url="http://localhost:6080"
+ENV policymgr_http_enabled="true"
+ENV policymgr_https_keystore_file=""
+ENV policymgr_https_keystore_keyalias="rangeradmin"
+ENV policymgr_https_keystore_password=""
+ENV policymgr_supportedcomponents=""
+ENV unix_user="ranger"
+ENV unix_user_pwd="ranger"
+ENV unix_group="ranger"
+ENV authentication_method="NONE"
+ENV remoteLoginEnabled="true"
+ENV authServiceHostName="localhost"
+ENV authServicePort="5151"
+ENV ranger_unixauth_keystore="keystore.jks"
+ENV ranger_unixauth_keystore_password="password"
+ENV ranger_unixauth_truststore="cacerts"
+ENV ranger_unixauth_truststore_password="changeit"
+ENV xa_ldap_url=""
+ENV xa_ldap_userDNpattern=""
+ENV xa_ldap_groupSearchBase=""
+ENV xa_ldap_groupSearchFilter=""
+ENV xa_ldap_groupRoleAttribute=""
+ENV xa_ldap_base_dn=""
+ENV xa_ldap_bind_dn=""
+ENV xa_ldap_bind_password=""
+ENV xa_ldap_referral=""
+ENV xa_ldap_userSearchFilter=""
+ENV xa_ldap_ad_domain=""
+ENV xa_ldap_ad_url=""
+ENV xa_ldap_ad_base_dn=""
+ENV xa_ldap_ad_bind_dn=""
+ENV xa_ldap_ad_bind_password=""
+ENV xa_ldap_ad_referral=""
+ENV xa_ldap_ad_userSearchFilter=""
+ENV spnego_principal=""
+ENV spnego_keytab=""
+ENV token_valid="30"
+ENV cookie_domain=""
+ENV cookie_path="/"
+ENV admin_principal=""
+ENV admin_keytab=""
+ENV lookup_principal=""
+ENV lookup_keytab=""
+ENV audit_jaas_client_loginModuleName=""
+ENV audit_jaas_client_loginModuleControlFlag=""
+ENV audit_jaas_client_option_useKeyTab=""
+ENV audit_jaas_client_option_storeKey=""
+ENV audit_jaas_client_option_useTicketCache=""
+ENV audit_jaas_client_option_serviceName=""
+ENV audit_jaas_client_option_keyTab=""
+ENV audit_jaas_client_option_principal=""
+ENV hadoop_conf="/etc/hadoop/conf"
+ENV sso_enabled="false"
+ENV sso_providerurl="https://127.0.0.1:8443/gateway/knoxsso/api/v1/websso"
+ENV sso_publickey=""
+ENV RANGER_ADMIN_LOG_DIR="$PWD"
+ENV RANGER_ADMIN_LOGBACK_CONF_FILE=""
+ENV RANGER_PID_DIR_PATH="/var/run/ranger"
+ENV XAPOLICYMGR_DIR="$PWD"
+ENV app_home="$PWD/ews/webapp"
+ENV TMPFILE="$PWD/.fi_tmp"
+ENV LOGFILE="$PWD/logfile"
+ENV LOGFILES=""$LOGFILE""
+ENV JAVA_BIN="'java'"
+ENV JAVA_VERSION_REQUIRED="'1.8'"
+ENV JAVA_ORACLE="'Java(TM) SE Runtime Environment'"
+ENV java_opts="''"
+ENV ranger_admin_max_heap_size="1g"
+ENV PATCH_RETRY_INTERVAL="120"
+ENV STALE_PATCH_ENTRY_HOLD_TIME="10"
+ENV mysql_core_file="db/mysql/optimized/current/ranger_core_db_mysql.sql"
+ENV mysql_audit_file="db/mysql/xa_audit_db.sql"
+ENV oracle_core_file="db/oracle/optimized/current/ranger_core_db_oracle.sql"
+ENV oracle_audit_file="db/oracle/xa_audit_db_oracle.sql"
+ENV postgres_core_file="db/postgres/optimized/current/ranger_core_db_postgres.sql"
+ENV postgres_audit_file="db/postgres/xa_audit_db_postgres.sql"
+ENV sqlserver_core_file="db/sqlserver/optimized/current/ranger_core_db_sqlserver.sql"
+ENV sqlserver_audit_file="db/sqlserver/xa_audit_db_sqlserver.sql"
+ENV sqlanywhere_core_file="db/sqlanywhere/optimized/current/ranger_core_db_sqlanywhere.sql"
+ENV sqlanywhere_audit_file="db/sqlanywhere/xa_audit_db_sqlanywhere.sql"
+ENV cred_keystore_filename="$app_home/WEB-INF/classes/conf/.jceks/rangeradmin.jceks"
+
+WORKDIR ${RANGER_HOME}
+
+RUN sed -i 's|^PYTHON_COMMAND_INVOKER=.*|PYTHON_COMMAND_INVOKER=\${PYTHON_COMMAND_INVOKER}|' install.properties && \
+    sed -i 's|^DB_FLAVOR=.*|DB_FLAVOR=\${DB_FLAVOR}|' install.properties && \
+    sed -i 's|^SQL_CONNECTOR_JAR=.*|SQL_CONNECTOR_JAR=\${SQL_CONNECTOR_JAR}|' install.properties && \
+    sed -i 's|^db_root_user=.*|db_root_user=\${db_root_user}|' install.properties && \
+    sed -i 's|^db_root_password=.*|db_root_password=\${db_root_password}|' install.properties && \
+    sed -i 's|^db_host=.*|db_host=\${db_host}|' install.properties && \
+    sed -i 's|^db_ssl_enabled=.*|db_ssl_enabled=\${db_ssl_enabled}|' install.properties && \
+    sed -i 's|^db_ssl_required=.*|db_ssl_required=\${db_ssl_required}|' install.properties && \
+    sed -i 's|^db_ssl_verifyServerCertificate=.*|db_ssl_verifyServerCertificate=\${db_ssl_verifyServerCertificate}|' install.properties && \
+    sed -i 's|^db_ssl_auth_type=.*|db_ssl_auth_type=\${db_ssl_auth_type}|' install.properties && \
+    sed -i 's|^javax_net_ssl_keyStore=.*|javax_net_ssl_keyStore=\${javax_net_ssl_keyStore}|' install.properties && \
+    sed -i 's|^javax_net_ssl_keyStorePassword=.*|javax_net_ssl_keyStorePassword=\${javax_net_ssl_keyStorePassword}|' install.properties && \
+    sed -i 's|^javax_net_ssl_trustStore=.*|javax_net_ssl_trustStore=\${javax_net_ssl_trustStore}|' install.properties && \
+    sed -i 's|^javax_net_ssl_trustStorePassword=.*|javax_net_ssl_trustStorePassword=\${javax_net_ssl_trustStorePassword}|' install.properties && \
+    sed -i 's|^javax_net_ssl_trustStore_type=.*|javax_net_ssl_trustStore_type=\${javax_net_ssl_trustStore_type}|' install.properties && \
+    sed -i 's|^javax_net_ssl_keyStore_type=.*|javax_net_ssl_keyStore_type=\${javax_net_ssl_keyStore_type}|' install.properties && \
+    sed -i 's|^db_ssl_certificate_file=.*|db_ssl_certificate_file=\${db_ssl_certificate_file}|' install.properties && \
+    sed -i 's|^db_name=.*|db_name=\${db_name}|' install.properties && \
+    sed -i 's|^db_user=.*|db_user=\${db_user}|' install.properties && \
+    sed -i 's|^db_password=.*|db_password=\${db_password}|' install.properties && \
+    sed -i 's|^is_override_db_connection_string=.*|is_override_db_connection_string=\${is_override_db_connection_string}|' install.properties && \
+    sed -i 's|^db_override_connection_string=.*|db_override_connection_string=\${db_override_connection_string}|' install.properties && \
+    sed -i 's|^rangerAdmin_password=.*|rangerAdmin_password=\${rangerAdmin_password}|' install.properties && \
+    sed -i 's|^rangerTagsync_password=.*|rangerTagsync_password=\${rangerTagsync_password}|' install.properties && \
+    sed -i 's|^rangerUsersync_password=.*|rangerUsersync_password=\${rangerUsersync_password}|' install.properties && \
+    sed -i 's|^keyadmin_password=.*|keyadmin_password=\${keyadmin_password}|' install.properties && \
+    sed -i 's|^audit_store=.*|audit_store=\${audit_store}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_urls=.*|audit_elasticsearch_urls=\${audit_elasticsearch_urls}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_port=.*|audit_elasticsearch_port=\${audit_elasticsearch_port}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_protocol=.*|audit_elasticsearch_protocol=\${audit_elasticsearch_protocol}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_user=.*|audit_elasticsearch_user=\${audit_elasticsearch_user}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_password=.*|audit_elasticsearch_password=\${audit_elasticsearch_password}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_index=.*|audit_elasticsearch_index=\${audit_elasticsearch_index}|' install.properties && \
+    sed -i 's|^audit_elasticsearch_bootstrap_enabled=.*|audit_elasticsearch_bootstrap_enabled=\${audit_elasticsearch_bootstrap_enabled}|' install.properties && \
+    sed -i 's|^audit_solr_urls=.*|audit_solr_urls=\${audit_solr_urls}|' install.properties && \
+    sed -i 's|^audit_solr_user=.*|audit_solr_user=\${audit_solr_user}|' install.properties && \
+    sed -i 's|^audit_solr_password=.*|audit_solr_password=\${audit_solr_password}|' install.properties && \
+    sed -i 's|^audit_solr_zookeepers=.*|audit_solr_zookeepers=\${audit_solr_zookeepers}|' install.properties && \
+    sed -i 's|^audit_solr_collection_name=.*|audit_solr_collection_name=\${audit_solr_collection_name}|' install.properties && \
+    sed -i 's|^audit_solr_config_name=.*|audit_solr_config_name=\${audit_solr_config_name}|' install.properties && \
+    sed -i 's|^audit_solr_configset_location=.*|audit_solr_configset_location=\${audit_solr_configset_location}|' install.properties && \
+    sed -i 's|^audit_solr_no_shards=.*|audit_solr_no_shards=\${audit_solr_no_shards}|' install.properties && \
+    sed -i 's|^audit_solr_no_replica=.*|audit_solr_no_replica=\${audit_solr_no_replica}|' install.properties && \
+    sed -i 's|^audit_solr_max_shards_per_node=.*|audit_solr_max_shards_per_node=\${audit_solr_max_shards_per_node}|' install.properties && \
+    sed -i 's|^audit_solr_acl_user_list_sasl=.*|audit_solr_acl_user_list_sasl=\${audit_solr_acl_user_list_sasl}|' install.properties && \
+    sed -i 's|^audit_solr_bootstrap_enabled=.*|audit_solr_bootstrap_enabled=\${audit_solr_bootstrap_enabled}|' install.properties && \
+    sed -i 's|^audit_cloudwatch_region=.*|audit_cloudwatch_region=\${audit_cloudwatch_region}|' install.properties && \
+    sed -i 's|^audit_cloudwatch_log_group=.*|audit_cloudwatch_log_group=\${audit_cloudwatch_log_group}|' install.properties && \
+    sed -i 's|^audit_cloudwatch_log_stream_prefix=.*|audit_cloudwatch_log_stream_prefix=\${audit_cloudwatch_log_stream_prefix}|' install.properties && \
+    sed -i 's|^policymgr_external_url=.*|policymgr_external_url=\${policymgr_external_url}|' install.properties && \
+    sed -i 's|^policymgr_http_enabled=.*|policymgr_http_enabled=\${policymgr_http_enabled}|' install.properties && \
+    sed -i 's|^policymgr_https_keystore_file=.*|policymgr_https_keystore_file=\${policymgr_https_keystore_file}|' install.properties && \
+    sed -i 's|^policymgr_https_keystore_keyalias=.*|policymgr_https_keystore_keyalias=\${policymgr_https_keystore_keyalias}|' install.properties && \
+    sed -i 's|^policymgr_https_keystore_password=.*|policymgr_https_keystore_password=\${policymgr_https_keystore_password}|' install.properties && \
+    sed -i 's|^policymgr_supportedcomponents=.*|policymgr_supportedcomponents=\${policymgr_supportedcomponents}|' install.properties && \
+    sed -i 's|^unix_user=.*|unix_user=\${unix_user}|' install.properties && \
+    sed -i 's|^unix_user_pwd=.*|unix_user_pwd=\${unix_user_pwd}|' install.properties && \
+    sed -i 's|^unix_group=.*|unix_group=\${unix_group}|' install.properties && \
+    sed -i 's|^authentication_method=.*|authentication_method=\${authentication_method}|' install.properties && \
+    sed -i 's|^remoteLoginEnabled=.*|remoteLoginEnabled=\${remoteLoginEnabled}|' install.properties && \
+    sed -i 's|^authServiceHostName=.*|authServiceHostName=\${authServiceHostName}|' install.properties && \
+    sed -i 's|^authServicePort=.*|authServicePort=\${authServicePort}|' install.properties && \
+    sed -i 's|^ranger_unixauth_keystore=.*|ranger_unixauth_keystore=\${ranger_unixauth_keystore}|' install.properties && \
+    sed -i 's|^ranger_unixauth_keystore_password=.*|ranger_unixauth_keystore_password=\${ranger_unixauth_keystore_password}|' install.properties && \
+    sed -i 's|^ranger_unixauth_truststore=.*|ranger_unixauth_truststore=\${ranger_unixauth_truststore}|' install.properties && \
+    sed -i 's|^ranger_unixauth_truststore_password=.*|ranger_unixauth_truststore_password=\${ranger_unixauth_truststore_password}|' install.properties && \
+    sed -i 's|^xa_ldap_url=.*|xa_ldap_url=\${xa_ldap_url}|' install.properties && \
+    sed -i 's|^xa_ldap_userDNpattern=.*|xa_ldap_userDNpattern=\${xa_ldap_userDNpattern}|' install.properties && \
+    sed -i 's|^xa_ldap_groupSearchBase=.*|xa_ldap_groupSearchBase=\${xa_ldap_groupSearchBase}|' install.properties && \
+    sed -i 's|^xa_ldap_groupSearchFilter=.*|xa_ldap_groupSearchFilter=\${xa_ldap_groupSearchFilter}|' install.properties && \
+    sed -i 's|^xa_ldap_groupRoleAttribute=.*|xa_ldap_groupRoleAttribute=\${xa_ldap_groupRoleAttribute}|' install.properties && \
+    sed -i 's|^xa_ldap_base_dn=.*|xa_ldap_base_dn=\${xa_ldap_base_dn}|' install.properties && \
+    sed -i 's|^xa_ldap_bind_dn=.*|xa_ldap_bind_dn=\${xa_ldap_bind_dn}|' install.properties && \
+    sed -i 's|^xa_ldap_bind_password=.*|xa_ldap_bind_password=\${xa_ldap_bind_password}|' install.properties && \
+    sed -i 's|^xa_ldap_referral=.*|xa_ldap_referral=\${xa_ldap_referral}|' install.properties && \
+    sed -i 's|^xa_ldap_userSearchFilter=.*|xa_ldap_userSearchFilter=\${xa_ldap_userSearchFilter}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_domain=.*|xa_ldap_ad_domain=\${xa_ldap_ad_domain}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_url=.*|xa_ldap_ad_url=\${xa_ldap_ad_url}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_base_dn=.*|xa_ldap_ad_base_dn=\${xa_ldap_ad_base_dn}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_bind_dn=.*|xa_ldap_ad_bind_dn=\${xa_ldap_ad_bind_dn}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_bind_password=.*|xa_ldap_ad_bind_password=\${xa_ldap_ad_bind_password}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_referral=.*|xa_ldap_ad_referral=\${xa_ldap_ad_referral}|' install.properties && \
+    sed -i 's|^xa_ldap_ad_userSearchFilter=.*|xa_ldap_ad_userSearchFilter=\${xa_ldap_ad_userSearchFilter}|' install.properties && \
+    sed -i 's|^spnego_principal=.*|spnego_principal=\${spnego_principal}|' install.properties && \
+    sed -i 's|^spnego_keytab=.*|spnego_keytab=\${spnego_keytab}|' install.properties && \
+    sed -i 's|^token_valid=.*|token_valid=\${token_valid}|' install.properties && \
+    sed -i 's|^cookie_domain=.*|cookie_domain=\${cookie_domain}|' install.properties && \
+    sed -i 's|^cookie_path=.*|cookie_path=\${cookie_path}|' install.properties && \
+    sed -i 's|^admin_principal=.*|admin_principal=\${admin_principal}|' install.properties && \
+    sed -i 's|^admin_keytab=.*|admin_keytab=\${admin_keytab}|' install.properties && \
+    sed -i 's|^lookup_principal=.*|lookup_principal=\${lookup_principal}|' install.properties && \
+    sed -i 's|^lookup_keytab=.*|lookup_keytab=\${lookup_keytab}|' install.properties && \
+    sed -i 's|^audit_jaas_client_loginModuleName=.*|audit_jaas_client_loginModuleName=\${audit_jaas_client_loginModuleName}|' install.properties && \
+    sed -i 's|^audit_jaas_client_loginModuleControlFlag=.*|audit_jaas_client_loginModuleControlFlag=\${audit_jaas_client_loginModuleControlFlag}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_useKeyTab=.*|audit_jaas_client_option_useKeyTab=\${audit_jaas_client_option_useKeyTab}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_storeKey=.*|audit_jaas_client_option_storeKey=\${audit_jaas_client_option_storeKey}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_useTicketCache=.*|audit_jaas_client_option_useTicketCache=\${audit_jaas_client_option_useTicketCache}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_serviceName=.*|audit_jaas_client_option_serviceName=\${audit_jaas_client_option_serviceName}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_keyTab=.*|audit_jaas_client_option_keyTab=\${audit_jaas_client_option_keyTab}|' install.properties && \
+    sed -i 's|^audit_jaas_client_option_principal=.*|audit_jaas_client_option_principal=\${audit_jaas_client_option_principal}|' install.properties && \
+    sed -i 's|^hadoop_conf=.*|hadoop_conf=\${hadoop_conf}|' install.properties && \
+    sed -i 's|^sso_enabled=.*|sso_enabled=\${sso_enabled}|' install.properties && \
+    sed -i 's|^sso_providerurl=.*|sso_providerurl=\${sso_providerurl}|' install.properties && \
+    sed -i 's|^sso_publickey=.*|sso_publickey=\${sso_publickey}|' install.properties && \
+    sed -i 's|^RANGER_ADMIN_LOG_DIR=.*|RANGER_ADMIN_LOG_DIR=\${RANGER_ADMIN_LOG_DIR}|' install.properties && \
+    sed -i 's|^RANGER_ADMIN_LOGBACK_CONF_FILE=.*|RANGER_ADMIN_LOGBACK_CONF_FILE=\${RANGER_ADMIN_LOGBACK_CONF_FILE}|' install.properties && \
+    sed -i 's|^RANGER_PID_DIR_PATH=.*|RANGER_PID_DIR_PATH=\${RANGER_PID_DIR_PATH}|' install.properties && \
+    sed -i 's|^XAPOLICYMGR_DIR=.*|XAPOLICYMGR_DIR=\${XAPOLICYMGR_DIR}|' install.properties && \
+    sed -i 's|^app_home=.*|app_home=\${app_home}|' install.properties && \
+    sed -i 's|^TMPFILE=.*|TMPFILE=\${TMPFILE}|' install.properties && \
+    sed -i 's|^LOGFILE=.*|LOGFILE=\${LOGFILE}|' install.properties && \
+    sed -i 's|^LOGFILES=.*|LOGFILES=\${LOGFILES}|' install.properties && \
+    sed -i 's|^JAVA_BIN=.*|JAVA_BIN=\${JAVA_BIN}|' install.properties && \
+    sed -i 's|^JAVA_VERSION_REQUIRED=.*|JAVA_VERSION_REQUIRED=\${JAVA_VERSION_REQUIRED}|' install.properties && \
+    sed -i 's|^JAVA_ORACLE=.*|JAVA_ORACLE=\${JAVA_ORACLE}|' install.properties && \
+    sed -i 's|^java_opts=.*|java_opts=\${java_opts}|' install.properties && \
+    sed -i 's|^ranger_admin_max_heap_size=.*|ranger_admin_max_heap_size=\${ranger_admin_max_heap_size}|' install.properties && \
+    sed -i 's|^PATCH_RETRY_INTERVAL=.*|PATCH_RETRY_INTERVAL=\${PATCH_RETRY_INTERVAL}|' install.properties && \
+    sed -i 's|^STALE_PATCH_ENTRY_HOLD_TIME=.*|STALE_PATCH_ENTRY_HOLD_TIME=\${STALE_PATCH_ENTRY_HOLD_TIME}|' install.properties && \
+    sed -i 's|^mysql_core_file=.*|mysql_core_file=\${mysql_core_file}|' install.properties && \
+    sed -i 's|^mysql_audit_file=.*|mysql_audit_file=\${mysql_audit_file}|' install.properties && \
+    sed -i 's|^oracle_core_file=.*|oracle_core_file=\${oracle_core_file}|' install.properties && \
+    sed -i 's|^oracle_audit_file=.*|oracle_audit_file=\${oracle_audit_file}|' install.properties && \
+    sed -i 's|^postgres_core_file=.*|postgres_core_file=\${postgres_core_file}|' install.properties && \
+    sed -i 's|^postgres_audit_file=.*|postgres_audit_file=\${postgres_audit_file}|' install.properties && \
+    sed -i 's|^sqlserver_core_file=.*|sqlserver_core_file=\${sqlserver_core_file}|' install.properties && \
+    sed -i 's|^sqlserver_audit_file=.*|sqlserver_audit_file=\${sqlserver_audit_file}|' install.properties && \
+    sed -i 's|^sqlanywhere_core_file=.*|sqlanywhere_core_file=\${sqlanywhere_core_file}|' install.properties && \
+    sed -i 's|^sqlanywhere_audit_file=.*|sqlanywhere_audit_file=\${sqlanywhere_audit_file}|' install.properties && \
+    sed -i 's|^cred_keystore_filename=.*|cred_keystore_filename=\${cred_keystore_filename}|' install.properties
 
 EXPOSE 6080
 

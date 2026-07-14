@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ranger-secret
+  name: ranger-secret-admin
   namespace: ranger
 type: Opaque
 stringData:
@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
       - name: ranger-admin
-        image: apache/ranger-custom-admin:2.8.0
+        image: apache/ranger-base:20251023-1-11
         envFrom:
           - configMapRef:
               name: ranger-config-admin

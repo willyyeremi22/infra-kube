@@ -4,10 +4,137 @@ ARG RANGER_VERSION=2.8.0
 
 ENV RANGER_HOME=/usr/lib/ranger/ranger--usersync
 
-RUN mkdir -p ${RANGER_HOME}
-
-RUN curl -fSL https://downloads.apache.org/ranger/${RANGER_VERSION}/services/usersync/ranger-${RANGER_VERSION}-usersync.tar.gz -o /tmp/ranger-usersync.tar.gz
-
-RUN tar -xzf /tmp/ranger-usersync.tar.gz --strip-components=1 -C ${RANGER_HOME} && \
+# Get Ranger
+RUN mkdir -p ${RANGER_HOME} && \
+    curl -fSL https://downloads.apache.org/ranger/${RANGER_VERSION}/services/usersync/ranger-${RANGER_VERSION}-usersync.tar.gz -o /tmp/ranger-usersync.tar.gz && \
+    tar -xzf /tmp/ranger-usersync.tar.gz --strip-components=1 -C ${RANGER_HOME} && \
     rm -f /tmp/ranger-usersync.tar.gz
 
+# ENV defaults
+ENV ranger_base_dir="/etc/ranger"
+ENV POLICY_MGR_URL=""
+ENV SYNC_SOURCE="unix"
+ENV MIN_UNIX_USER_ID_TO_SYNC="500"
+ENV MIN_UNIX_GROUP_ID_TO_SYNC="500"
+ENV SYNC_INTERVAL=""
+ENV unix_user="ranger"
+ENV unix_group="ranger"
+ENV rangerUsersync_password=""
+ENV usersync_principal=""
+ENV usersync_keytab=""
+ENV hadoop_conf="/etc/hadoop/conf"
+ENV CRED_KEYSTORE_FILENAME="/etc/ranger/usersync/conf/rangerusersync.jceks"
+ENV AUTH_SSL_ENABLED="false"
+ENV AUTH_SSL_KEYSTORE_FILE="/etc/ranger/usersync/conf/cert/unixauthservice.jks"
+ENV AUTH_SSL_KEYSTORE_PASSWORD="UnIx529p"
+ENV AUTH_SSL_TRUSTSTORE_FILE=""
+ENV AUTH_SSL_TRUSTSTORE_PASSWORD=""
+ENV ROLE_ASSIGNMENT_LIST_DELIMITER="&"
+ENV USERS_GROUPS_ASSIGNMENT_LIST_DELIMITER=":"
+ENV USERNAME_GROUPNAME_ASSIGNMENT_LIST_DELIMITER=","
+ENV GROUP_BASED_ROLE_ASSIGNMENT_RULES=""
+ENV SYNC_LDAP_URL=""
+ENV SYNC_LDAP_BIND_DN=""
+ENV SYNC_LDAP_BIND_PASSWORD=""
+ENV SYNC_LDAP_DELTASYNC=""
+ENV SYNC_LDAP_SEARCH_BASE=""
+ENV SYNC_LDAP_USER_SEARCH_BASE=""
+ENV SYNC_LDAP_USER_SEARCH_SCOPE="sub"
+ENV SYNC_LDAP_USER_OBJECT_CLASS="person"
+ENV SYNC_LDAP_USER_SEARCH_FILTER=""
+ENV SYNC_LDAP_USER_NAME_ATTRIBUTE="cn"
+ENV SYNC_LDAP_USER_GROUP_NAME_ATTRIBUTE="memberof,ismemberof"
+ENV SYNC_LDAP_USERNAME_CASE_CONVERSION="lower"
+ENV SYNC_LDAP_GROUPNAME_CASE_CONVERSION="lower"
+ENV logdir="logs"
+ENV USERSYNC_PID_DIR_PATH="/var/run/ranger"
+ENV SYNC_GROUP_SEARCH_ENABLED=""
+ENV SYNC_GROUP_USER_MAP_SYNC_ENABLED=""
+ENV SYNC_GROUP_SEARCH_BASE=""
+ENV SYNC_GROUP_SEARCH_SCOPE=""
+ENV SYNC_GROUP_OBJECT_CLASS=""
+ENV SYNC_LDAP_GROUP_SEARCH_FILTER=""
+ENV SYNC_GROUP_NAME_ATTRIBUTE=""
+ENV SYNC_GROUP_MEMBER_ATTRIBUTE_NAME=""
+ENV SYNC_PAGED_RESULTS_ENABLED=""
+ENV SYNC_PAGED_RESULTS_SIZE=""
+ENV SYNC_LDAP_REFERRAL="follow"
+ENV JVM_METRICS_ENABLED=""
+ENV JVM_METRICS_FILENAME=""
+ENV JVM_METRICS_FILEPATH=""
+ENV JVM_METRICS_FREQUENCY_TIME_IN_MILLIS=""
+
+WORKDIR ${RANGER_HOME}
+
+RUN sed -i 's|^ranger_base_dir[[:space:]]*=.*|ranger_base_dir=\${ranger_base_dir}|' install.properties && \
+    sed -i 's|^POLICY_MGR_URL[[:space:]]*=.*|POLICY_MGR_URL=\${POLICY_MGR_URL}|' install.properties && \
+    sed -i 's|^SYNC_SOURCE[[:space:]]*=.*|SYNC_SOURCE=\${SYNC_SOURCE}|' install.properties && \
+    sed -i 's|^MIN_UNIX_USER_ID_TO_SYNC[[:space:]]*=.*|MIN_UNIX_USER_ID_TO_SYNC=\${MIN_UNIX_USER_ID_TO_SYNC}|' install.properties && \
+    sed -i 's|^MIN_UNIX_GROUP_ID_TO_SYNC[[:space:]]*=.*|MIN_UNIX_GROUP_ID_TO_SYNC=\${MIN_UNIX_GROUP_ID_TO_SYNC}|' install.properties && \
+    sed -i 's|^SYNC_INTERVAL[[:space:]]*=.*|SYNC_INTERVAL=\${SYNC_INTERVAL}|' install.properties && \
+    sed -i 's|^unix_user[[:space:]]*=.*|unix_user=\${unix_user}|' install.properties && \
+    sed -i 's|^unix_group[[:space:]]*=.*|unix_group=\${unix_group}|' install.properties && \
+    sed -i 's|^rangerUsersync_password[[:space:]]*=.*|rangerUsersync_password=\${rangerUsersync_password}|' install.properties && \
+    sed -i 's|^usersync_principal[[:space:]]*=.*|usersync_principal=\${usersync_principal}|' install.properties && \
+    sed -i 's|^usersync_keytab[[:space:]]*=.*|usersync_keytab=\${usersync_keytab}|' install.properties && \
+    sed -i 's|^hadoop_conf[[:space:]]*=.*|hadoop_conf=\${hadoop_conf}|' install.properties && \
+    sed -i 's|^CRED_KEYSTORE_FILENAME[[:space:]]*=.*|CRED_KEYSTORE_FILENAME=\${CRED_KEYSTORE_FILENAME}|' install.properties && \
+    sed -i 's|^AUTH_SSL_ENABLED[[:space:]]*=.*|AUTH_SSL_ENABLED=\${AUTH_SSL_ENABLED}|' install.properties && \
+    sed -i 's|^AUTH_SSL_KEYSTORE_FILE[[:space:]]*=.*|AUTH_SSL_KEYSTORE_FILE=\${AUTH_SSL_KEYSTORE_FILE}|' install.properties && \
+    sed -i 's|^AUTH_SSL_KEYSTORE_PASSWORD[[:space:]]*=.*|AUTH_SSL_KEYSTORE_PASSWORD=\${AUTH_SSL_KEYSTORE_PASSWORD}|' install.properties && \
+    sed -i 's|^AUTH_SSL_TRUSTSTORE_FILE[[:space:]]*=.*|AUTH_SSL_TRUSTSTORE_FILE=\${AUTH_SSL_TRUSTSTORE_FILE}|' install.properties && \
+    sed -i 's|^AUTH_SSL_TRUSTSTORE_PASSWORD[[:space:]]*=.*|AUTH_SSL_TRUSTSTORE_PASSWORD=\${AUTH_SSL_TRUSTSTORE_PASSWORD}|' install.properties && \
+    sed -i 's|^ROLE_ASSIGNMENT_LIST_DELIMITER[[:space:]]*=.*|ROLE_ASSIGNMENT_LIST_DELIMITER=\${ROLE_ASSIGNMENT_LIST_DELIMITER}|' install.properties && \
+    sed -i 's|^USERS_GROUPS_ASSIGNMENT_LIST_DELIMITER[[:space:]]*=.*|USERS_GROUPS_ASSIGNMENT_LIST_DELIMITER=\${USERS_GROUPS_ASSIGNMENT_LIST_DELIMITER}|' install.properties && \
+    sed -i 's|^USERNAME_GROUPNAME_ASSIGNMENT_LIST_DELIMITER[[:space:]]*=.*|USERNAME_GROUPNAME_ASSIGNMENT_LIST_DELIMITER=\${USERNAME_GROUPNAME_ASSIGNMENT_LIST_DELIMITER}|' install.properties && \
+    sed -i 's|^GROUP_BASED_ROLE_ASSIGNMENT_RULES[[:space:]]*=.*|GROUP_BASED_ROLE_ASSIGNMENT_RULES=\${GROUP_BASED_ROLE_ASSIGNMENT_RULES}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_URL[[:space:]]*=.*|SYNC_LDAP_URL=\${SYNC_LDAP_URL}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_BIND_DN[[:space:]]*=.*|SYNC_LDAP_BIND_DN=\${SYNC_LDAP_BIND_DN}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_BIND_PASSWORD[[:space:]]*=.*|SYNC_LDAP_BIND_PASSWORD=\${SYNC_LDAP_BIND_PASSWORD}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_DELTASYNC[[:space:]]*=.*|SYNC_LDAP_DELTASYNC=\${SYNC_LDAP_DELTASYNC}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_SEARCH_BASE[[:space:]]*=.*|SYNC_LDAP_SEARCH_BASE=\${SYNC_LDAP_SEARCH_BASE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_SEARCH_BASE[[:space:]]*=.*|SYNC_LDAP_USER_SEARCH_BASE=\${SYNC_LDAP_USER_SEARCH_BASE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_SEARCH_SCOPE[[:space:]]*=.*|SYNC_LDAP_USER_SEARCH_SCOPE=\${SYNC_LDAP_USER_SEARCH_SCOPE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_OBJECT_CLASS[[:space:]]*=.*|SYNC_LDAP_USER_OBJECT_CLASS=\${SYNC_LDAP_USER_OBJECT_CLASS}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_SEARCH_FILTER[[:space:]]*=.*|SYNC_LDAP_USER_SEARCH_FILTER=\${SYNC_LDAP_USER_SEARCH_FILTER}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_NAME_ATTRIBUTE[[:space:]]*=.*|SYNC_LDAP_USER_NAME_ATTRIBUTE=\${SYNC_LDAP_USER_NAME_ATTRIBUTE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USER_GROUP_NAME_ATTRIBUTE[[:space:]]*=.*|SYNC_LDAP_USER_GROUP_NAME_ATTRIBUTE=\${SYNC_LDAP_USER_GROUP_NAME_ATTRIBUTE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_USERNAME_CASE_CONVERSION[[:space:]]*=.*|SYNC_LDAP_USERNAME_CASE_CONVERSION=\${SYNC_LDAP_USERNAME_CASE_CONVERSION}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_GROUPNAME_CASE_CONVERSION[[:space:]]*=.*|SYNC_LDAP_GROUPNAME_CASE_CONVERSION=\${SYNC_LDAP_GROUPNAME_CASE_CONVERSION}|' install.properties && \
+    sed -i 's|^logdir[[:space:]]*=.*|logdir=\${logdir}|' install.properties && \
+    sed -i 's|^USERSYNC_PID_DIR_PATH[[:space:]]*=.*|USERSYNC_PID_DIR_PATH=\${USERSYNC_PID_DIR_PATH}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_SEARCH_ENABLED[[:space:]]*=.*|SYNC_GROUP_SEARCH_ENABLED=\${SYNC_GROUP_SEARCH_ENABLED}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_USER_MAP_SYNC_ENABLED[[:space:]]*=.*|SYNC_GROUP_USER_MAP_SYNC_ENABLED=\${SYNC_GROUP_USER_MAP_SYNC_ENABLED}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_SEARCH_BASE[[:space:]]*=.*|SYNC_GROUP_SEARCH_BASE=\${SYNC_GROUP_SEARCH_BASE}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_SEARCH_SCOPE[[:space:]]*=.*|SYNC_GROUP_SEARCH_SCOPE=\${SYNC_GROUP_SEARCH_SCOPE}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_OBJECT_CLASS[[:space:]]*=.*|SYNC_GROUP_OBJECT_CLASS=\${SYNC_GROUP_OBJECT_CLASS}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_GROUP_SEARCH_FILTER[[:space:]]*=.*|SYNC_LDAP_GROUP_SEARCH_FILTER=\${SYNC_LDAP_GROUP_SEARCH_FILTER}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_NAME_ATTRIBUTE[[:space:]]*=.*|SYNC_GROUP_NAME_ATTRIBUTE=\${SYNC_GROUP_NAME_ATTRIBUTE}|' install.properties && \
+    sed -i 's|^SYNC_GROUP_MEMBER_ATTRIBUTE_NAME[[:space:]]*=.*|SYNC_GROUP_MEMBER_ATTRIBUTE_NAME=\${SYNC_GROUP_MEMBER_ATTRIBUTE_NAME}|' install.properties && \
+    sed -i 's|^SYNC_PAGED_RESULTS_ENABLED[[:space:]]*=.*|SYNC_PAGED_RESULTS_ENABLED=\${SYNC_PAGED_RESULTS_ENABLED}|' install.properties && \
+    sed -i 's|^SYNC_PAGED_RESULTS_SIZE[[:space:]]*=.*|SYNC_PAGED_RESULTS_SIZE=\${SYNC_PAGED_RESULTS_SIZE}|' install.properties && \
+    sed -i 's|^SYNC_LDAP_REFERRAL[[:space:]]*=.*|SYNC_LDAP_REFERRAL=\${SYNC_LDAP_REFERRAL}|' install.properties && \
+    sed -i 's|^JVM_METRICS_ENABLED[[:space:]]*=.*|JVM_METRICS_ENABLED=\${JVM_METRICS_ENABLED}|' install.properties && \
+    sed -i 's|^JVM_METRICS_FILENAME[[:space:]]*=.*|JVM_METRICS_FILENAME=\${JVM_METRICS_FILENAME}|' install.properties && \
+    sed -i 's|^JVM_METRICS_FILEPATH[[:space:]]*=.*|JVM_METRICS_FILEPATH=\${JVM_METRICS_FILEPATH}|' install.properties && \
+    sed -i 's|^JVM_METRICS_FREQUENCY_TIME_IN_MILLIS[[:space:]]*=.*|JVM_METRICS_FREQUENCY_TIME_IN_MILLIS=\${JVM_METRICS_FREQUENCY_TIME_IN_MILLIS}|' install.properties
+
+EXPOSE 5151
+
+RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && rm -rf /var/lib/apt/lists/*
+
+COPY <<'EOF' /usr/lib/ranger/ranger--usersync/entrypoint.sh
+#!/usr/bin/env bash
+set -e
+
+INSTALL_PROPERTIES="${RANGER_HOME}/install.properties"
+
+envsubst < "${INSTALL_PROPERTIES}" > "${INSTALL_PROPERTIES}.tmp"
+mv "${INSTALL_PROPERTIES}.tmp" "${INSTALL_PROPERTIES}"
+
+exec ./setup.sh
+EOF
+
+RUN chmod +x /usr/lib/ranger/ranger--usersync/entrypoint.sh
+
+ENTRYPOINT ["/usr/lib/ranger/ranger--usersync/entrypoint.sh"]
