@@ -1,0 +1,175 @@
+---
+# =========================================================
+# Setup index template + ISM policy untuk index audit log
+# Apache Ranger di OpenSearch (tanpa user, security plugin disabled).
+#
+# Ranger diarahkan menulis ke ALIAS "ranger_audit_logs" (bukan nama
+# index langsung). Alias ini menunjuk ke index fisik yang di-rollover
+# otomatis oleh ISM, sehingga index tidak menumpuk tak terbatas.
+#
+# Contoh config di sisi Ranger (ranger-*-audit.xml / Ambari/Cloudera):
+#   xasecure.audit.destination.elasticsearch=true
+#   xasecure.audit.destination.elasticsearch.urls=opensearch-coordinator.opensearch.svc.cluster.local:9200
+#   xasecure.audit.destination.elasticsearch.protocol=http
+#   xasecure.audit.destination.elasticsearch.index=ranger_audit_logs
+#   xasecure.audit.destination.elasticsearch.user=
+#   xasecure.audit.destination.elasticsearch.password=
+# (user/password dikosongkan karena security plugin OpenSearch nonaktif)
+# =========================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-init-config
+  namespace: opensearch
+data:
+  index-template.json: |
+    {
+      "index_patterns": ["ranger_audit_logs-*"],
+      "priority": 100,
+      "template": {
+        "settings": {
+          "number_of_shards": 1,
+          "number_of_replicas": 0,
+          "index.plugins.index_state_management.rollover_alias": "ranger_audit_logs"
+        },
+        "mappings": {
+          "dynamic_templates": [
+            {
+              "strings_as_keyword": {
+                "match_mapping_type": "string",
+                "mapping": {
+                  "type": "keyword",
+                  "ignore_above": 1024
+                }
+              }
+            }
+          ],
+          "properties": {
+            "evtTime": { "type": "date" },
+            "eventTime": { "type": "date" }
+          }
+        }
+      }
+    }
+
+  ism-policy.json: |
+    {
+      "policy": {
+        "description": "Rollover & retention policy untuk Ranger audit logs",
+        "default_state": "hot",
+        "states": [
+          {
+            "name": "hot",
+            "actions": [
+              {
+                "rollover": {
+                  "min_index_age": "1d",
+                  "min_size": "5gb"
+                }
+              }
+            ],
+            "transitions": [
+              {
+                "state_name": "delete",
+                "conditions": { "min_index_age": "30d" }
+              }
+            ]
+          },
+          {
+            "name": "delete",
+            "actions": [ { "delete": {} } ],
+            "transitions": []
+          }
+        ],
+        "ism_template": [
+          {
+            "index_patterns": ["ranger_audit_logs-*"],
+            "priority": 100
+          }
+        ]
+      }
+    }
+
+  setup.sh: |
+    #!/bin/sh
+    set -eu
+
+    OS_URL="http://opensearch-coordinator.opensearch.svc.cluster.local:9200"
+    POLICY_ID="ranger_audit_logs_policy"
+    TEMPLATE_ID="ranger_audit_logs_template"
+    ALIAS="ranger_audit_logs"
+    BOOTSTRAP_INDEX="ranger_audit_logs-000001"
+
+    echo "Menunggu OpenSearch siap di ${OS_URL} ..."
+    until curl -s -o /dev/null -w '%{http_code}' "${OS_URL}/_cluster/health" | grep -q '^200$'; do
+      echo "  belum siap, retry 5s..."
+      sleep 5
+    done
+    echo "OpenSearch sudah siap."
+
+    echo "Cek ISM policy '${POLICY_ID}'..."
+    POLICY_CODE=$(curl -s -o /dev/null -w '%{http_code}' "${OS_URL}/_plugins/_ism/policies/${POLICY_ID}")
+    if [ "${POLICY_CODE}" = "200" ]; then
+      echo "  sudah ada, skip."
+    else
+      echo "  membuat ISM policy..."
+      curl -sf -X PUT "${OS_URL}/_plugins/_ism/policies/${POLICY_ID}" -H 'Content-Type: application/json' -d @/config/ism-policy.json
+      echo
+    fi
+
+    echo "Cek index template '${TEMPLATE_ID}'..."
+    TEMPLATE_CODE=$(curl -s -o /dev/null -w '%{http_code}' "${OS_URL}/_index_template/${TEMPLATE_ID}")
+    if [ "${TEMPLATE_CODE}" = "200" ]; then
+      echo "  sudah ada, skip."
+    else
+      echo "  membuat index template..."
+      curl -sf -X PUT "${OS_URL}/_index_template/${TEMPLATE_ID}" -H 'Content-Type: application/json' -d @/config/index-template.json
+      echo
+    fi
+
+    echo "Cek alias '${ALIAS}'..."
+    ALIAS_CODE=$(curl -s -o /dev/null -w '%{http_code}' "${OS_URL}/_alias/${ALIAS}")
+    if [ "${ALIAS_CODE}" = "200" ]; then
+      echo "  sudah ada, skip pembuatan bootstrap index."
+    else
+      echo "  membuat bootstrap index '${BOOTSTRAP_INDEX}' dengan write alias '${ALIAS}'..."
+      curl -sf -X PUT "${OS_URL}/${BOOTSTRAP_INDEX}" -H 'Content-Type: application/json' -d "{\"aliases\": {\"${ALIAS}\": {\"is_write_index\": true}}}"
+      echo
+    fi
+
+    echo "Setup selesai. Ranger bisa mulai menulis ke index/alias '${ALIAS}'."
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: opensearch-init
+  namespace: opensearch
+spec:
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: opensearch-init
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: setup
+        image: "curlimages/curl:8.11.0"
+        command: ["/bin/sh", "/config/setup.sh"]
+        volumeMounts:
+        - name: setup-config
+          mountPath: /config
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "32Mi"
+          limits:
+            cpu: "200m"
+            memory: "64Mi"
+      volumes:
+      - name: setup-config
+        configMap:
+          name: opensearch-init-config
+          defaultMode: 0755

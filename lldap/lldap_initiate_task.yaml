@@ -97,7 +97,8 @@ stringData:
           "displayName": "Ranger Service",
           "password": "password",
           "groups": [
-            "ranger_service"
+            "ranger_service",
+            "lldap_strict_readonly"
           ]
         }
       ]

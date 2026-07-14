@@ -28,6 +28,5 @@ spec:
               done
 
               mc mb --ignore-existing local/lakehouse
-              mc mb --ignore-existing local/ranger-audit
               mc mb --ignore-existing local/airflow-logs
 
