@@ -322,6 +322,8 @@ mv "${INSTALL_PROPERTIES}.tmp" "${INSTALL_PROPERTIES}"
 exec ./setup.sh
 EOF
 
+RUN sed -i 's/\r$//' /usr/lib/ranger/ranger--admin/entrypoint.sh
+
 RUN chmod +x /usr/lib/ranger/ranger--admin/entrypoint.sh
 
 ENTRYPOINT ["/usr/lib/ranger/ranger--admin/entrypoint.sh"]
