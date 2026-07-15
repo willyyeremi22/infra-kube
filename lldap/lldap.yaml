@@ -62,8 +62,6 @@ spec:
           containerPort: 17170
         envFrom:
           - configMapRef:
-              name: lldap-config-common
-          - configMapRef:
               name: lldap-config
           - secretRef:
               name: lldap-secret

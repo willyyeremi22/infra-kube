@@ -56,15 +56,16 @@ kubectl apply -f ./ranger/ranger.yaml -n ranger
 
 kubectl logs -n rdbms statefulset.apps/postgres-metadata
 kubectl logs -n rdbms statefulset.apps/postgres-ops
-kubectl logs -n airflow deployment.apps/airflow-scheduler
-kubectl logs -n lldap deployment.apps/lldap
-kubectl logs -n ranger deployment.apps/ranger-admin
 kubectl logs -n opensearch statefulset.apps/opensearch-cluster-manager
 kubectl logs -n opensearch statefulset.apps/opensearch-data
 kubectl logs -n opensearch statefulset.apps/opensearch-coordinator
 kubectl logs -n opensearch deployment.apps/opensearch-dashboard
+kubectl logs -n airflow deployment.apps/airflow-scheduler
+kubectl logs -n lldap deployment.apps/lldap
+kubectl logs -n ranger deployment.apps/ranger-admin
 
-kubectl describe pod ranger-admin-85b86fb99d-gtsbb -n ranger   
+
+kubectl describe pod lldap-54499c9bc8-nsfr2 -n lldap   
 
 kubectl exec -it -n lldap lldap-init-tfw7s -- /bin/bash
 
