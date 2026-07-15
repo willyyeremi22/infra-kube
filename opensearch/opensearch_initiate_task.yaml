@@ -157,6 +157,7 @@ spec:
       containers:
       - name: setup
         image: "curlimages/curl:8.11.0"
+        imagePullPolicy: IfNotPresent
         command: ["/bin/sh", "/config/setup.sh"]
         volumeMounts:
         - name: setup-config

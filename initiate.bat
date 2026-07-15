@@ -21,6 +21,7 @@ kubectl apply -f ./opensearch/opensearch_configmap_common.yaml -n opensearch
 kubectl apply -f ./opensearch/opensearch.yaml -n opensearch
 kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
 kubectl apply -f ./opensearch/opensearch_initiate_task.yaml -n opensearch
+@REM C
 
 @REM tier 2
 
@@ -65,7 +66,9 @@ kubectl logs -n lldap deployment.apps/lldap
 kubectl logs -n ranger deployment.apps/ranger-admin
 
 
-kubectl describe pod lldap-54499c9bc8-nsfr2 -n lldap   
+kubectl describe pod opensearch-init-dctm6 -n opensearch   
+
+kubectl get pods -n opensearch -o wide
 
 kubectl exec -it -n lldap lldap-init-tfw7s -- /bin/bash
 

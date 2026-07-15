@@ -101,10 +101,10 @@ spec:
           failureThreshold: 5
         resources:
           requests:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "2"
+            memory: "2Gi"
           limits:
-            cpu: "1"
+            cpu: "2"
             memory: "2Gi"
       volumes:
       - name: opensearch-config-manager
@@ -259,8 +259,8 @@ spec:
           failureThreshold: 5
         resources:
           requests:
-            cpu: "1"
-            memory: "1.5Gi"
+            cpu: "2"
+            memory: "2Gi"
           limits:
             cpu: "2"
             memory: "2Gi"
@@ -404,8 +404,8 @@ spec:
           failureThreshold: 5
         resources:
           requests:
-            cpu: "1m"
-            memory: "1Gi"
+            cpu: "2"
+            memory: "2Gi"
           limits:
             cpu: "2"
             memory: "2Gi"
@@ -480,8 +480,8 @@ data:
     server.maxPayloadBytes: 1048576
     opensearch_security.enabled: false
     data_source.enabled: true
-    workspace.enabled: true
     explore.enabled: true
+    # workspace.enabled: true
 
 ---
 apiVersion: apps/v1
@@ -514,14 +514,24 @@ spec:
           httpGet:
             path: /
             port: 5601
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30 
         readinessProbe:
           httpGet:
             path: /
             port: 5601
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30 
         livenessProbe:
           httpGet:
             path: /
             port: 5601
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30 
         resources:
           requests:
             cpu: "250m"
