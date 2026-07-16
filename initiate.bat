@@ -64,6 +64,7 @@ kubectl logs -n opensearch deployment.apps/opensearch-dashboard
 kubectl logs -n airflow deployment.apps/airflow-scheduler
 kubectl logs -n lldap deployment.apps/lldap
 kubectl logs -n ranger deployment.apps/ranger-admin
+kubectl logs -n ranger deployment.apps/ranger-usersync
 
 
 kubectl describe pod ranger-admin-85b86fb99d-h67z7 -n ranger
@@ -73,6 +74,11 @@ kubectl get pods -n opensearch -o wide
 kubectl exec -it -n lldap lldap-init-tfw7s -- /bin/bash
 
 kubectl exec -it -n lldap lldap-init-l59px -- /bin/bash
+
+kubectl get pods -n ranger -o wide
+
+kubectl describe pod ranger-admin-85b86fb99d-7zpdr -n ranger
+
 
 
 docker create --name ranger-temp apache/ranger:2.8.0
@@ -118,6 +124,7 @@ docker run --rm -v "%cd%:/chart" -w /chart alpine/helm:3.18.6 template opensearc
 
 docker run --rm --entrypoint /bin/bash lldap/lldap:2026-05-26 -c 'cat /app/bootstrap.sh'
 
+docker run --rm --entrypoint /bin/bash apache/ranger-custom-usersync:2.8.0 -c 'cat /usr/lib/ranger/ranger--usersync/ranger-usersync-services.sh'
 
 kubectl get pod ranger-admin-85b86fb99d-g7zf5 -n ranger -o jsonpath='{.status.containerStatuses[0].imageID}'
 docker image inspect apache/ranger-custom-admin:2.8.0 --format='{{.Id}}'
