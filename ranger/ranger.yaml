@@ -67,6 +67,7 @@ spec:
       containers:
       - name: ranger-admin
         image: apache/ranger-custom-admin:2.8.0
+        # imagePullPolicy: Never
         envFrom:
           - configMapRef:
               name: ranger-config-admin
@@ -143,6 +144,7 @@ spec:
       containers:
       - name: ranger-usersync
         image: apache/ranger-custom-usersync:2.8.0
+        # imagePullPolicy: Never
         envFrom:
           - configMapRef:
               name: ranger-config-usersync

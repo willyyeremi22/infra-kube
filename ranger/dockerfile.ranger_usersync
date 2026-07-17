@@ -126,7 +126,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends gettext-base &&
 
 COPY <<'EOF' /usr/lib/ranger/ranger--usersync/ranger-usersync-services.sh
 #!/usr/bin/env bash
-set -e
 
 cd "$(dirname "$(readlink -f "$0")")"
 
@@ -177,9 +176,9 @@ INSTALL_PROPERTIES="${RANGER_HOME}/install.properties"
 envsubst < "${INSTALL_PROPERTIES}" > "${INSTALL_PROPERTIES}.tmp"
 mv "${INSTALL_PROPERTIES}.tmp" "${INSTALL_PROPERTIES}"
 
-# ./setup.sh
+./setup.sh
 
-# exec ./ranger-usersync-services.sh start
+exec ./ranger-usersync-services.sh start
 
 EOF
 

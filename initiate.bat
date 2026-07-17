@@ -70,6 +70,8 @@ kubectl logs -n ranger deployment.apps/ranger-usersync
 
 
 
+kubectl rollout restart deployment ranger-usersync -n ranger
+
 kubectl exec -it -n ranger ranger-usersync-5f4645756c-pcd2p -- sh -c 'cat /usr/bin/ranger-usersync' > grep-result.log
 
 
