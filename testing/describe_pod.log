@@ -1,0 +1,65 @@
+Name:             ranger-usersync-5f4645756c-bmdkn
+Namespace:        ranger
+Priority:         0
+Service Account:  default
+Node:             desktop-worker4/172.18.0.10
+Start Time:       Fri, 17 Jul 2026 07:29:40 +0700
+Labels:           app=ranger-usersync
+                  pod-template-hash=5f4645756c
+Annotations:      <none>
+Status:           Running
+IP:               10.244.4.4
+IPs:
+  IP:           10.244.4.4
+Controlled By:  ReplicaSet/ranger-usersync-5f4645756c
+Containers:
+  ranger-usersync:
+    Container ID:   containerd://570d7c3a6a184a9ca89eaa9b37dc2f0dbcb3f6fbe58dfd5fe6956631f69ec10a
+    Image:          apache/ranger-custom-usersync:2.8.0
+    Image ID:       docker.io/apache/ranger-custom-usersync@sha256:a94139481781a5c648f5953457da222e9d54fc24d36c006f9f5e972f8816d55e
+    Port:           5151/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Fri, 17 Jul 2026 07:33:29 +0700
+      Finished:     Fri, 17 Jul 2026 07:33:37 +0700
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Fri, 17 Jul 2026 07:31:53 +0700
+      Finished:     Fri, 17 Jul 2026 07:32:02 +0700
+    Ready:          False
+    Restart Count:  5
+    Environment Variables from:
+      ranger-config-usersync  ConfigMap  Optional: false
+      ranger-secret-usersync  Secret     Optional: false
+    Environment:              <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-tdpwm (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-tdpwm:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  5m5s                 default-scheduler  Successfully assigned ranger/ranger-usersync-5f4645756c-bmdkn to desktop-worker4
+  Normal   Pulled     77s (x6 over 5m4s)   kubelet            spec.containers{ranger-usersync}: Container image "apache/ranger-custom-usersync:2.8.0" already present on machine and can be accessed by the pod
+  Normal   Created    77s (x6 over 5m3s)   kubelet            spec.containers{ranger-usersync}: Container created
+  Normal   Started    76s (x6 over 5m2s)   kubelet            spec.containers{ranger-usersync}: Container started
+  Warning  BackOff    67s (x5 over 4m35s)  kubelet            spec.containers{ranger-usersync}: Back-off restarting failed container ranger-usersync in pod ranger-usersync-5f4645756c-bmdkn_ranger(3e14708a-7708-4f0e-b60e-146a8601c4f7)

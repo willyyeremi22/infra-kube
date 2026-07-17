@@ -1,0 +1,3 @@
+NAME                               READY   STATUS      RESTARTS        AGE    IP           NODE              NOMINATED NODE   READINESS GATES
+ranger-admin-64cf8b8584-64z2r      0/1     Completed   4 (2m8s ago)    5m6s   10.244.1.3   desktop-worker2   <none>           <none>
+ranger-usersync-5f4645756c-bmdkn   0/1     Completed   5 (2m43s ago)   5m6s   10.244.4.4   desktop-worker4   <none>           <none>

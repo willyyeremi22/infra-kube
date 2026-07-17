@@ -1,5 +1,5 @@
-docker build -f ./airflow/dockerfile.airflow_fab_s3 -t apache/airflow:3.2.2-python3.14-fab-s3 .
-docker build -f ./airflow/dockerfile.airflow_fab -t apache/airflow:3.2.2-python3.14-fab .
+docker build -f ./airflow/dockerfile.airflow_fab_s3 --no-cache -t apache/airflow:3.2.2-python3.14-fab-s3 .
+docker build -f ./airflow/dockerfile.airflow_fab --no-cache -t apache/airflow:3.2.2-python3.14-fab .
 docker build -f ./ranger/dockerfile.ranger_admin --no-cache -t apache/ranger-custom-admin:2.8.0 . @REM 2 >&1 | Tee-Object -FilePath build.log
 docker build -f ./ranger/dockerfile.ranger_usersync --no-cache -t apache/ranger-custom-usersync:2.8.0 .
 
@@ -67,18 +67,10 @@ kubectl logs -n ranger deployment.apps/ranger-admin
 kubectl logs -n ranger deployment.apps/ranger-usersync
 
 
-kubectl describe pod ranger-admin-85b86fb99d-h67z7 -n ranger
 
-kubectl get pods -n opensearch -o wide
 
-kubectl exec -it -n lldap lldap-init-tfw7s -- /bin/bash
 
-kubectl exec -it -n lldap lldap-init-l59px -- /bin/bash
-
-kubectl get pods -n ranger -o wide
-
-kubectl describe pod ranger-admin-85b86fb99d-7zpdr -n ranger
-
+kubectl exec -it -n ranger ranger-usersync-5f4645756c-pcd2p -- sh -c 'cat /usr/bin/ranger-usersync' > grep-result.log
 
 
 docker create --name ranger-temp apache/ranger:2.8.0
@@ -87,33 +79,20 @@ docker create --name ranger-temp apache/ranger-base:20260123-2-17
 
 docker cp ranger-temp:opt/ranger/admin/setup.sh .
 
-docker cp ranger-temp:/home/ranger/scripts/ranger-admin-install.properties .
 
-docker cp ranger-temp:opt/ranger/admin/ews/ranger-admin-services.sh .
-
-docker cp ranger-temp:/home/ranger/scripts/create-ranger-services.py .
-
-docker cp ranger-temp:opt/ranger/admin/install.properties .
-
-docker cp ranger-temp:/home/ranger/scripts/download-ranger.sh .
-
-docker cp ranger-temp:/home/ranger/scripts/download-ranger.sh .
 
 docker run --rm --entrypoint /bin/bash apache/ranger:2.8.0 -c 'find /opt/ranger -maxdepth 2 -type d | sort'
 
 docker run --rm --entrypoint /bin/bash apache/ranger:2.8.0 -c 'find /opt/ranger -name "db_setup.py"'
 
-docker cp ranger-temp:/opt/ranger/ranger-2.8.0-admin/db_setup.py .
+docker cp charming_sinoussi:/usr/lib/ranger/ranger--usersync/entrypoint.sh .
 
-docker run --rm --entrypoint /bin/bash apache/ranger-base:20260123-2-17 -c 'mvn -version'
+docker run --rm --entrypoint /bin/bash apache/ranger-custom-admin:2.8.0 -c 'ls -l'
 
 
 docker run --rm --entrypoint /bin/bash apache/ranger-custom-usersync:2.8.0 -c 'ls /usr/lib/ranger/ranger--usersync'
 
-docker run --rm --entrypoint /bin/bash apache/ranger-custom-usersync:2.8.0 -c 'cat /usr/lib/ranger/ranger--usersync/install.properties'
-
-docker run --rm --entrypoint /bin/bash apache/ranger-custom-admin:2.8.0 -c 'cat -A /usr/lib/ranger/ranger--admin/entrypoint.sh'
-docker cp focused_jennings:/usr/lib/ranger/ranger--admin/setup.sh .
+docker cp xenodochial_jones:/usr/lib/ranger/ranger--usersync/ranger-usersync .
 
 
 docker run --rm -v ${PWD}:/work alpine/helm:3.18.6 template opensearch /work/charts/opensearch > rendered.yaml
