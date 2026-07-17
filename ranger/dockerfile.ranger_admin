@@ -288,6 +288,43 @@ WORKDIR ${RANGER_HOME}
 RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && \
     rm -rf /var/lib/apt/lists/*
 
+COPY <<'EOF' /usr/lib/ranger/ranger--admin/ews/ranger-admin-services.sh
+#!/usr/bin/env bash
+set -e
+
+# load env
+source ${RANGER_HOME}/ews/webapp/WEB-INF/classes/conf/java_home.sh
+export PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Turunkan path yang dibutuhkan classpath (sebelumnya hilang -> ClassNotFoundException)
+XAPOLICYMGR_EWS_DIR="${RANGER_HOME}/ews"
+RANGER_JAAS_LIB_DIR="${XAPOLICYMGR_EWS_DIR}/ranger_jaas"
+RANGER_JAAS_CONF_DIR="${XAPOLICYMGR_EWS_DIR}/webapp/WEB-INF/classes/conf/ranger_jaas"
+
+if [ -z "${RANGER_ADMIN_LOGBACK_CONF_FILE}" ]; then
+    RANGER_ADMIN_LOGBACK_CONF_FILE="${XAPOLICYMGR_EWS_DIR}/webapp/WEB-INF/classes/conf/logback.xml"
+fi
+
+exec java \
+    -Dproc_rangeradmin \
+    ${JAVA_OPTS} \
+    -Dlogback.configurationFile=file:${RANGER_ADMIN_LOGBACK_CONF_FILE} \
+    -Duser=${USER} \
+    -Dhostname=${HOSTNAME} \
+    -Dservername=rangeradmin \
+    -Dlogdir=${RANGER_ADMIN_LOG_DIR} \
+    -Dcatalina.base=${XAPOLICYMGR_EWS_DIR} \
+    -cp "${XAPOLICYMGR_EWS_DIR}/webapp/WEB-INF/classes/conf:${XAPOLICYMGR_EWS_DIR}/lib/*:${XAPOLICYMGR_EWS_DIR}/webapp/WEB-INF/lib/*:${RANGER_JAAS_LIB_DIR}/*:${RANGER_JAAS_CONF_DIR}:${JAVA_HOME}/lib/*:${RANGER_HADOOP_CONF_DIR}/*:$CLASSPATH" \
+    org.apache.ranger.server.tomcat.EmbeddedServer
+
+EOF
+
+RUN sed -i 's/\r$//' ${RANGER_HOME}/ews/ranger-admin-services.sh
+
+# COPY /usr/lib/ranger/ranger-usersync-services.sh ${RANGER_HOME}/ranger-usersync-services.sh
+
+RUN chmod +x ${RANGER_HOME}/ews/ranger-admin-services.sh
+
 COPY <<'EOF' /usr/lib/ranger/ranger--admin/entrypoint.sh
 #!/usr/bin/env bash
 set -e
@@ -319,7 +356,10 @@ esac
 envsubst < "${INSTALL_PROPERTIES}" > "${INSTALL_PROPERTIES}.tmp"
 mv "${INSTALL_PROPERTIES}.tmp" "${INSTALL_PROPERTIES}"
 
-exec ./setup.sh
+./setup.sh
+
+exec ./ews/ranger-admin-services.sh
+
 EOF
 
 RUN sed -i 's/\r$//' ${RANGER_HOME}/entrypoint.sh

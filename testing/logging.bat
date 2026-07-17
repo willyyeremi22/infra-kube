@@ -1,5 +1,5 @@
 set NAMESPACE=ranger
-set POD=ranger-usersync-5f4645756c-nv4qr
+set POD=ranger-usersync-5948dfc7c-9s7rz
 
 
 set LOGFILE=%~dp0logs.log

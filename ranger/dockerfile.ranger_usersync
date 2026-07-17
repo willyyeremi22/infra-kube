@@ -10,6 +10,8 @@ RUN mkdir -p ${RANGER_HOME} && \
     tar -xzf /tmp/ranger-usersync.tar.gz --strip-components=1 -C ${RANGER_HOME} && \
     rm -f /tmp/ranger-usersync.tar.gz
 
+RUN sed -i '1a set -e' ${RANGER_HOME}/setup.sh
+
 # ENV defaults
 ENV ranger_base_dir="/etc/ranger"
 ENV POLICY_MGR_URL=""
@@ -121,7 +123,7 @@ RUN sed -i 's|^ranger_base_dir[[:space:]]*=.*|ranger_base_dir=\${ranger_base_dir
 
 EXPOSE 5151
 
-RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && \ 
+RUN apt-get update && apt-get install -y --no-install-recommends gettext-base && \
     rm -rf /var/lib/apt/lists/*
 
 COPY <<'EOF' /usr/lib/ranger/ranger--usersync/ranger-usersync-services.sh
@@ -178,12 +180,14 @@ mv "${INSTALL_PROPERTIES}.tmp" "${INSTALL_PROPERTIES}"
 
 ./setup.sh
 
-exec ./ranger-usersync-services.sh start
+exec ./ranger-usersync-services.sh
 
 EOF
 
 RUN sed -i 's/\r$//' ${RANGER_HOME}/entrypoint.sh
 
 RUN chmod +x ${RANGER_HOME}/entrypoint.sh
+
+USER root
 
 ENTRYPOINT ["/usr/lib/ranger/ranger--usersync/entrypoint.sh"]
