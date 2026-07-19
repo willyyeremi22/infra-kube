@@ -32,6 +32,12 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: hive
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: airflow
 
 ---
