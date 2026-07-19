@@ -1,0 +1,405 @@
+17:09:33.243 [main] DEBUG org.apache.hadoop.util.Shell -- Failed to detect a valid hadoop home directory
+java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset.
+	at org.apache.hadoop.util.Shell.checkHadoopHomeInner(Shell.java:521)
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:492)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:569)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.conf.Configuration.getStringCollection(Configuration.java:2312)
+	at org.apache.hadoop.security.alias.CredentialProviderFactory.getProviders(CredentialProviderFactory.java:76)
+	at org.apache.ranger.credentialapi.CredentialReader.getDecryptedString(CredentialReader.java:74)
+	at org.apache.ranger.credentialapi.buildks.createCredential(buildks.java:87)
+	at org.apache.ranger.credentialapi.buildks.main(buildks.java:41)
+17:09:33.481 [main] DEBUG org.apache.hadoop.util.Shell -- setsid exited with exit code 0
+17:09:33.556 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:34.182 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"GetGroups"})
+17:09:34.217 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of failed kerberos logins and latency (milliseconds)"})
+17:09:34.218 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of successful kerberos logins and latency (milliseconds)"})
+17:09:34.220 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeInt org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailures with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since last successful login"})
+17:09:34.221 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeLong org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailuresTotal with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since startup"})
+17:09:34.242 [main] DEBUG org.apache.hadoop.metrics2.impl.MetricsSystemImpl -- UgiMetrics, User and group related metrics
+17:09:34.296 [main] DEBUG org.apache.hadoop.security.SecurityUtil -- Setting hadoop.security.token.service.use_ip to true
+17:09:34.508 [main] DEBUG org.apache.hadoop.security.Groups --  Creating new Groups object
+17:09:34.511 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Trying to load the custom-built native-hadoop library...
+17:09:34.526 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path: [/usr/java/packages/lib, /usr/lib64, /lib64, /lib, /usr/lib]
+17:09:34.526 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+17:09:34.526 [main] WARN org.apache.hadoop.util.NativeCodeLoader -- Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17:09:34.527 [main] DEBUG org.apache.hadoop.util.PerformanceAdvisory -- Falling back to shell based
+17:09:34.528 [main] DEBUG org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback -- Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+17:09:34.618 [main] DEBUG org.apache.hadoop.security.Groups -- Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+17:09:34.756 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Hadoop login
+17:09:34.761 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- hadoop login commit
+17:09:34.784 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using local user: UnixPrincipal: root
+17:09:34.803 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using user: "UnixPrincipal: root" with name: root
+17:09:34.804 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- User entry: "root"
+17:09:34.805 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- UGI loginUser: root (auth:SIMPLE)
+17:09:34.811 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:34.811 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.002s
+17:09:34.822 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:34.823 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Loading filesystems
+17:09:35.161 [main] DEBUG org.apache.hadoop.fs.FileSystem -- file:// = class org.apache.hadoop.fs.LocalFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.263 [main] DEBUG org.apache.hadoop.fs.FileSystem -- viewfs:// = class org.apache.hadoop.fs.viewfs.ViewFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.436 [main] DEBUG org.apache.hadoop.fs.FileSystem -- har:// = class org.apache.hadoop.fs.HarFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.441 [main] DEBUG org.apache.hadoop.fs.FileSystem -- http:// = class org.apache.hadoop.fs.http.HttpFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.444 [main] DEBUG org.apache.hadoop.fs.FileSystem -- https:// = class org.apache.hadoop.fs.http.HttpsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.562 [main] DEBUG org.apache.hadoop.fs.FileSystem -- hdfs:// = class org.apache.hadoop.hdfs.DistributedFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.746 [main] DEBUG org.apache.hadoop.fs.FileSystem -- webhdfs:// = class org.apache.hadoop.hdfs.web.WebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.754 [main] DEBUG org.apache.hadoop.fs.FileSystem -- swebhdfs:// = class org.apache.hadoop.hdfs.web.SWebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:35.757 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking for FS supporting file
+17:09:35.757 [main] DEBUG org.apache.hadoop.fs.FileSystem -- looking for configuration option fs.file.impl
+17:09:36.003 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking in service filesystems for implementation class
+17:09:36.199 [main] DEBUG org.apache.hadoop.fs.FileSystem -- FS for file is class org.apache.hadoop.fs.LocalFileSystem
+17:09:36.209 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Jar location for class org.apache.hadoop.fs.LocalFileSystem : /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:36.720 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Checksum verification enabled=true
+17:09:36.875 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:02.052s
+17:09:37.313 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+WARNING: You have accepted the use of the default provider password
+by not configuring a password in one of the two following locations:
+    * In the environment variable HADOOP_CREDSTORE_PASSWORD
+    * In a file referred to by the configuration entry
+      hadoop.security.credstore.java-keystore-provider.password-file.
+Please review the documentation regarding provider passwords in
+the keystore passwords section of the Credential Provider API
+Continuing with the default provider password.
+
+17:09:37.812 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+17:09:37.907 [main] DEBUG org.apache.hadoop.fs.statistics.impl.IOStatisticsContextIntegration -- Created instance IOStatisticsContextImpl{id=1, threadId=1, ioStatistics=counters=();
+gauges=();
+minimums=();
+maximums=();
+means=();
+}
+ranger.usersync.ldap.bindalias has been successfully created.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:09:38.095 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.FilterFileSystem.close(FilterFileSystem.java:529)); Key: (root (auth:SIMPLE))@file://; URI: file:///; Object Identity Hash: 7788c36e
+17:09:38.110 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.RawLocalFileSystem.close(RawLocalFileSystem.java:960)); Key: null; URI: file:///; Object Identity Hash: 9808499
+17:09:38.115 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- Completed shutdown in 0.033 seconds; Timeouts: 0
+17:09:38.141 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- ShutdownHookManager completed shutdown.
+17:09:42.486 [main] DEBUG org.apache.hadoop.util.Shell -- Failed to detect a valid hadoop home directory
+java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset.
+	at org.apache.hadoop.util.Shell.checkHadoopHomeInner(Shell.java:521)
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:492)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:569)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.conf.Configuration.getStringCollection(Configuration.java:2312)
+	at org.apache.hadoop.security.alias.CredentialProviderFactory.getProviders(CredentialProviderFactory.java:76)
+	at org.apache.ranger.credentialapi.CredentialReader.getDecryptedString(CredentialReader.java:74)
+	at org.apache.ranger.credentialapi.buildks.createCredential(buildks.java:87)
+	at org.apache.ranger.credentialapi.buildks.main(buildks.java:41)
+17:09:42.633 [main] DEBUG org.apache.hadoop.util.Shell -- setsid exited with exit code 0
+17:09:42.676 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:44.349 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"GetGroups"})
+17:09:44.714 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of failed kerberos logins and latency (milliseconds)"})
+17:09:44.722 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of successful kerberos logins and latency (milliseconds)"})
+17:09:44.723 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeInt org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailures with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since last successful login"})
+17:09:44.724 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeLong org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailuresTotal with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since startup"})
+17:09:44.776 [main] DEBUG org.apache.hadoop.metrics2.impl.MetricsSystemImpl -- UgiMetrics, User and group related metrics
+17:09:44.868 [main] DEBUG org.apache.hadoop.security.SecurityUtil -- Setting hadoop.security.token.service.use_ip to true
+17:09:45.210 [main] DEBUG org.apache.hadoop.security.Groups --  Creating new Groups object
+17:09:45.216 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Trying to load the custom-built native-hadoop library...
+17:09:45.293 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path: [/usr/java/packages/lib, /usr/lib64, /lib64, /lib, /usr/lib]
+17:09:45.293 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+17:09:45.293 [main] WARN org.apache.hadoop.util.NativeCodeLoader -- Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17:09:45.294 [main] DEBUG org.apache.hadoop.util.PerformanceAdvisory -- Falling back to shell based
+17:09:45.305 [main] DEBUG org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback -- Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+17:09:45.480 [main] DEBUG org.apache.hadoop.security.Groups -- Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+17:09:45.774 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Hadoop login
+17:09:45.813 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- hadoop login commit
+17:09:45.836 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using local user: UnixPrincipal: root
+17:09:45.872 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using user: "UnixPrincipal: root" with name: root
+17:09:45.873 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- User entry: "root"
+17:09:45.882 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- UGI loginUser: root (auth:SIMPLE)
+17:09:45.914 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:45.914 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.006s
+17:09:45.931 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:45.932 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Loading filesystems
+17:09:46.036 [main] DEBUG org.apache.hadoop.fs.FileSystem -- file:// = class org.apache.hadoop.fs.LocalFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.079 [main] DEBUG org.apache.hadoop.fs.FileSystem -- viewfs:// = class org.apache.hadoop.fs.viewfs.ViewFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.101 [main] DEBUG org.apache.hadoop.fs.FileSystem -- har:// = class org.apache.hadoop.fs.HarFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.116 [main] DEBUG org.apache.hadoop.fs.FileSystem -- http:// = class org.apache.hadoop.fs.http.HttpFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.121 [main] DEBUG org.apache.hadoop.fs.FileSystem -- https:// = class org.apache.hadoop.fs.http.HttpsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.257 [main] DEBUG org.apache.hadoop.fs.FileSystem -- hdfs:// = class org.apache.hadoop.hdfs.DistributedFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.339 [main] DEBUG org.apache.hadoop.fs.FileSystem -- webhdfs:// = class org.apache.hadoop.hdfs.web.WebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.344 [main] DEBUG org.apache.hadoop.fs.FileSystem -- swebhdfs:// = class org.apache.hadoop.hdfs.web.SWebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.345 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking for FS supporting file
+17:09:46.348 [main] DEBUG org.apache.hadoop.fs.FileSystem -- looking for configuration option fs.file.impl
+17:09:46.428 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking in service filesystems for implementation class
+17:09:46.430 [main] DEBUG org.apache.hadoop.fs.FileSystem -- FS for file is class org.apache.hadoop.fs.LocalFileSystem
+17:09:46.431 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Jar location for class org.apache.hadoop.fs.LocalFileSystem : /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:46.486 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Checksum verification enabled=true
+17:09:46.490 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.559s
+17:09:47.959 [main] DEBUG org.apache.hadoop.fs.statistics.impl.IOStatisticsContextIntegration -- Created instance IOStatisticsContextImpl{id=1, threadId=1, ioStatistics=counters=();
+gauges=();
+minimums=();
+maximums=();
+means=();
+}
+17:09:48.787 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+WARNING: You have accepted the use of the default provider password
+by not configuring a password in one of the two following locations:
+    * In the environment variable HADOOP_CREDSTORE_PASSWORD
+    * In a file referred to by the configuration entry
+      hadoop.security.credstore.java-keystore-provider.password-file.
+Please review the documentation regarding provider passwords in
+the keystore passwords section of the Credential Provider API
+Continuing with the default provider password.
+
+17:09:49.664 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+usersync.ssl.key.password has been successfully created.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:09:49.828 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.FilterFileSystem.close(FilterFileSystem.java:529)); Key: (root (auth:SIMPLE))@file://; URI: file:///; Object Identity Hash: 18a145b4
+17:09:49.832 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.RawLocalFileSystem.close(RawLocalFileSystem.java:960)); Key: null; URI: file:///; Object Identity Hash: 66c64101
+17:09:49.854 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- Completed shutdown in 0.025 seconds; Timeouts: 0
+17:09:49.913 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- ShutdownHookManager completed shutdown.
+17:09:53.005 [main] DEBUG org.apache.hadoop.util.Shell -- Failed to detect a valid hadoop home directory
+java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset.
+	at org.apache.hadoop.util.Shell.checkHadoopHomeInner(Shell.java:521)
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:492)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:569)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.conf.Configuration.getStringCollection(Configuration.java:2312)
+	at org.apache.hadoop.security.alias.CredentialProviderFactory.getProviders(CredentialProviderFactory.java:76)
+	at org.apache.ranger.credentialapi.CredentialReader.getDecryptedString(CredentialReader.java:74)
+	at org.apache.ranger.credentialapi.buildks.createCredential(buildks.java:87)
+	at org.apache.ranger.credentialapi.buildks.main(buildks.java:41)
+17:09:53.718 [main] DEBUG org.apache.hadoop.util.Shell -- setsid exited with exit code 0
+17:09:53.790 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:54.677 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"GetGroups"})
+17:09:54.700 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of failed kerberos logins and latency (milliseconds)"})
+17:09:54.701 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of successful kerberos logins and latency (milliseconds)"})
+17:09:54.706 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeInt org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailures with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since last successful login"})
+17:09:54.710 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeLong org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailuresTotal with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since startup"})
+17:09:54.732 [main] DEBUG org.apache.hadoop.metrics2.impl.MetricsSystemImpl -- UgiMetrics, User and group related metrics
+17:09:54.786 [main] DEBUG org.apache.hadoop.security.SecurityUtil -- Setting hadoop.security.token.service.use_ip to true
+17:09:55.676 [main] DEBUG org.apache.hadoop.security.Groups --  Creating new Groups object
+17:09:55.680 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Trying to load the custom-built native-hadoop library...
+17:09:55.816 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path: [/usr/java/packages/lib, /usr/lib64, /lib64, /lib, /usr/lib]
+17:09:55.816 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+17:09:55.816 [main] WARN org.apache.hadoop.util.NativeCodeLoader -- Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17:09:55.828 [main] DEBUG org.apache.hadoop.util.PerformanceAdvisory -- Falling back to shell based
+17:09:55.850 [main] DEBUG org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback -- Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+17:09:56.080 [main] DEBUG org.apache.hadoop.security.Groups -- Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+17:09:57.170 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Hadoop login
+17:09:57.347 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- hadoop login commit
+17:09:57.441 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using local user: UnixPrincipal: root
+17:09:57.545 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using user: "UnixPrincipal: root" with name: root
+17:09:57.546 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- User entry: "root"
+17:09:57.547 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- UGI loginUser: root (auth:SIMPLE)
+17:09:57.553 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:57.554 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.003s
+17:09:57.563 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:09:57.563 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Loading filesystems
+17:09:57.642 [main] DEBUG org.apache.hadoop.fs.FileSystem -- file:// = class org.apache.hadoop.fs.LocalFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.682 [main] DEBUG org.apache.hadoop.fs.FileSystem -- viewfs:// = class org.apache.hadoop.fs.viewfs.ViewFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.689 [main] DEBUG org.apache.hadoop.fs.FileSystem -- har:// = class org.apache.hadoop.fs.HarFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.693 [main] DEBUG org.apache.hadoop.fs.FileSystem -- http:// = class org.apache.hadoop.fs.http.HttpFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.697 [main] DEBUG org.apache.hadoop.fs.FileSystem -- https:// = class org.apache.hadoop.fs.http.HttpsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.727 [main] DEBUG org.apache.hadoop.fs.FileSystem -- hdfs:// = class org.apache.hadoop.hdfs.DistributedFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.770 [main] DEBUG org.apache.hadoop.fs.FileSystem -- webhdfs:// = class org.apache.hadoop.hdfs.web.WebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.784 [main] DEBUG org.apache.hadoop.fs.FileSystem -- swebhdfs:// = class org.apache.hadoop.hdfs.web.SWebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.784 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking for FS supporting file
+17:09:57.784 [main] DEBUG org.apache.hadoop.fs.FileSystem -- looking for configuration option fs.file.impl
+17:09:57.825 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking in service filesystems for implementation class
+17:09:57.827 [main] DEBUG org.apache.hadoop.fs.FileSystem -- FS for file is class org.apache.hadoop.fs.LocalFileSystem
+17:09:57.829 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Jar location for class org.apache.hadoop.fs.LocalFileSystem : /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:09:57.866 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Checksum verification enabled=true
+17:09:57.867 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.303s
+17:09:58.406 [main] DEBUG org.apache.hadoop.fs.statistics.impl.IOStatisticsContextIntegration -- Created instance IOStatisticsContextImpl{id=1, threadId=1, ioStatistics=counters=();
+gauges=();
+minimums=();
+maximums=();
+means=();
+}
+17:09:58.641 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+WARNING: You have accepted the use of the default provider password
+by not configuring a password in one of the two following locations:
+    * In the environment variable HADOOP_CREDSTORE_PASSWORD
+    * In a file referred to by the configuration entry
+      hadoop.security.credstore.java-keystore-provider.password-file.
+Please review the documentation regarding provider passwords in
+the keystore passwords section of the Credential Provider API
+Continuing with the default provider password.
+
+17:09:59.526 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+usersync.ssl.truststore.password has been successfully created.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:10:00.734 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.FilterFileSystem.close(FilterFileSystem.java:529)); Key: (root (auth:SIMPLE))@file://; URI: file:///; Object Identity Hash: 364f0916
+17:10:00.739 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.RawLocalFileSystem.close(RawLocalFileSystem.java:960)); Key: null; URI: file:///; Object Identity Hash: 4806c0d4
+17:10:00.818 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- Completed shutdown in 0.093 seconds; Timeouts: 0
+17:10:00.872 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- ShutdownHookManager completed shutdown.
+17:10:05.912 [main] DEBUG org.apache.hadoop.util.Shell -- Failed to detect a valid hadoop home directory
+java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset.
+	at org.apache.hadoop.util.Shell.checkHadoopHomeInner(Shell.java:521)
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:492)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:569)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.conf.Configuration.getStringCollection(Configuration.java:2312)
+	at org.apache.hadoop.security.alias.CredentialProviderFactory.getProviders(CredentialProviderFactory.java:76)
+	at org.apache.ranger.credentialapi.CredentialReader.getDecryptedString(CredentialReader.java:74)
+	at org.apache.ranger.credentialapi.buildks.createCredential(buildks.java:87)
+	at org.apache.ranger.credentialapi.buildks.main(buildks.java:41)
+17:10:06.801 [main] DEBUG org.apache.hadoop.util.Shell -- setsid exited with exit code 0
+17:10:06.879 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:08.187 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"GetGroups"})
+17:10:08.275 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of failed kerberos logins and latency (milliseconds)"})
+17:10:08.280 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of successful kerberos logins and latency (milliseconds)"})
+17:10:08.281 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeInt org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailures with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since last successful login"})
+17:10:08.283 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeLong org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailuresTotal with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since startup"})
+17:10:08.345 [main] DEBUG org.apache.hadoop.metrics2.impl.MetricsSystemImpl -- UgiMetrics, User and group related metrics
+17:10:08.415 [main] DEBUG org.apache.hadoop.security.SecurityUtil -- Setting hadoop.security.token.service.use_ip to true
+17:10:08.728 [main] DEBUG org.apache.hadoop.security.Groups --  Creating new Groups object
+17:10:08.735 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Trying to load the custom-built native-hadoop library...
+17:10:08.775 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path: [/usr/java/packages/lib, /usr/lib64, /lib64, /lib, /usr/lib]
+17:10:08.776 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+17:10:08.776 [main] WARN org.apache.hadoop.util.NativeCodeLoader -- Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17:10:08.777 [main] DEBUG org.apache.hadoop.util.PerformanceAdvisory -- Falling back to shell based
+17:10:08.779 [main] DEBUG org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback -- Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+17:10:08.880 [main] DEBUG org.apache.hadoop.security.Groups -- Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+17:10:09.007 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Hadoop login
+17:10:09.009 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- hadoop login commit
+17:10:09.014 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using local user: UnixPrincipal: root
+17:10:09.020 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using user: "UnixPrincipal: root" with name: root
+17:10:09.020 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- User entry: "root"
+17:10:09.022 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- UGI loginUser: root (auth:SIMPLE)
+17:10:09.024 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:09.024 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.001s
+17:10:09.033 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:09.034 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Loading filesystems
+17:10:09.313 [main] DEBUG org.apache.hadoop.fs.FileSystem -- file:// = class org.apache.hadoop.fs.LocalFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.383 [main] DEBUG org.apache.hadoop.fs.FileSystem -- viewfs:// = class org.apache.hadoop.fs.viewfs.ViewFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.487 [main] DEBUG org.apache.hadoop.fs.FileSystem -- har:// = class org.apache.hadoop.fs.HarFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.500 [main] DEBUG org.apache.hadoop.fs.FileSystem -- http:// = class org.apache.hadoop.fs.http.HttpFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.512 [main] DEBUG org.apache.hadoop.fs.FileSystem -- https:// = class org.apache.hadoop.fs.http.HttpsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.645 [main] DEBUG org.apache.hadoop.fs.FileSystem -- hdfs:// = class org.apache.hadoop.hdfs.DistributedFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.758 [main] DEBUG org.apache.hadoop.fs.FileSystem -- webhdfs:// = class org.apache.hadoop.hdfs.web.WebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.763 [main] DEBUG org.apache.hadoop.fs.FileSystem -- swebhdfs:// = class org.apache.hadoop.hdfs.web.SWebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:09.763 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking for FS supporting file
+17:10:09.764 [main] DEBUG org.apache.hadoop.fs.FileSystem -- looking for configuration option fs.file.impl
+17:10:10.028 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking in service filesystems for implementation class
+17:10:10.029 [main] DEBUG org.apache.hadoop.fs.FileSystem -- FS for file is class org.apache.hadoop.fs.LocalFileSystem
+17:10:10.032 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Jar location for class org.apache.hadoop.fs.LocalFileSystem : /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:10.129 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Checksum verification enabled=true
+17:10:10.129 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:01.096s
+17:10:11.177 [main] DEBUG org.apache.hadoop.fs.statistics.impl.IOStatisticsContextIntegration -- Created instance IOStatisticsContextImpl{id=1, threadId=1, ioStatistics=counters=();
+gauges=();
+minimums=();
+maximums=();
+means=();
+}
+17:10:12.123 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+WARNING: You have accepted the use of the default provider password
+by not configuring a password in one of the two following locations:
+    * In the environment variable HADOOP_CREDSTORE_PASSWORD
+    * In a file referred to by the configuration entry
+      hadoop.security.credstore.java-keystore-provider.password-file.
+Please review the documentation regarding provider passwords in
+the keystore passwords section of the Credential Provider API
+Continuing with the default provider password.
+
+17:10:12.677 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+ranger.usersync.policymgr.password has been successfully created.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:10:12.860 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.FilterFileSystem.close(FilterFileSystem.java:529)); Key: (root (auth:SIMPLE))@file://; URI: file:///; Object Identity Hash: 73a0b011
+17:10:12.865 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.RawLocalFileSystem.close(RawLocalFileSystem.java:960)); Key: null; URI: file:///; Object Identity Hash: d2c4330
+17:10:12.876 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- Completed shutdown in 0.037 seconds; Timeouts: 0
+17:10:12.904 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- ShutdownHookManager completed shutdown.
+2026-07-18 17:10:16,470  [I] Using Java:/opt/java/openjdk/bin/java
+2026-07-18 17:10:16,482  [I] SYNC_LDAP_BIND_KEYSTOREPATH:/etc/ranger/usersync/conf/rangerusersync.jceks
+2026-07-18 17:10:16,483  [I] Storing policymgr usersync password in credential store:
+17:10:20.905 [main] DEBUG org.apache.hadoop.util.Shell -- Failed to detect a valid hadoop home directory
+java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset.
+	at org.apache.hadoop.util.Shell.checkHadoopHomeInner(Shell.java:521)
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:492)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:569)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.conf.Configuration.getStringCollection(Configuration.java:2312)
+	at org.apache.hadoop.security.alias.CredentialProviderFactory.getProviders(CredentialProviderFactory.java:76)
+	at org.apache.ranger.credentialapi.CredentialReader.getDecryptedString(CredentialReader.java:74)
+	at org.apache.ranger.credentialapi.buildks.createCredential(buildks.java:87)
+	at org.apache.ranger.credentialapi.buildks.main(buildks.java:41)
+17:10:23.142 [main] DEBUG org.apache.hadoop.util.Shell -- setsid exited with exit code 0
+17:10:23.321 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:23.766 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"GetGroups"})
+17:10:23.802 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of failed kerberos logins and latency (milliseconds)"})
+17:10:23.805 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Rate of successful kerberos logins and latency (milliseconds)"})
+17:10:23.806 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeInt org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailures with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since last successful login"})
+17:10:23.806 [main] DEBUG org.apache.hadoop.metrics2.lib.MutableMetricsFactory -- field private org.apache.hadoop.metrics2.lib.MutableGaugeLong org.apache.hadoop.security.UserGroupInformation$UgiMetrics.renewalFailuresTotal with annotation @org.apache.hadoop.metrics2.annotation.Metric(sampleName="Ops", always=false, valueName="Time", about="", interval=10, type=DEFAULT, value={"Renewal failures since startup"})
+17:10:23.842 [main] DEBUG org.apache.hadoop.metrics2.impl.MetricsSystemImpl -- UgiMetrics, User and group related metrics
+17:10:23.940 [main] DEBUG org.apache.hadoop.security.SecurityUtil -- Setting hadoop.security.token.service.use_ip to true
+17:10:24.216 [main] DEBUG org.apache.hadoop.security.Groups --  Creating new Groups object
+17:10:24.223 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Trying to load the custom-built native-hadoop library...
+17:10:24.296 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path: [/usr/java/packages/lib, /usr/lib64, /lib64, /lib, /usr/lib]
+17:10:24.297 [main] DEBUG org.apache.hadoop.util.NativeCodeLoader -- java.library.path=/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib
+17:10:24.297 [main] WARN org.apache.hadoop.util.NativeCodeLoader -- Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17:10:24.299 [main] DEBUG org.apache.hadoop.util.PerformanceAdvisory -- Falling back to shell based
+17:10:24.311 [main] DEBUG org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback -- Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+17:10:24.527 [main] DEBUG org.apache.hadoop.security.Groups -- Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+17:10:24.683 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Hadoop login
+17:10:24.690 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- hadoop login commit
+17:10:24.697 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using local user: UnixPrincipal: root
+17:10:24.705 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- Using user: "UnixPrincipal: root" with name: root
+17:10:24.705 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- User entry: "root"
+17:10:24.705 [main] DEBUG org.apache.hadoop.security.UserGroupInformation -- UGI loginUser: root (auth:SIMPLE)
+17:10:24.708 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:24.708 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Acquiring creator semaphore for file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.001s
+17:10:24.715 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Starting: Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks
+17:10:24.715 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Loading filesystems
+17:10:24.761 [main] DEBUG org.apache.hadoop.fs.FileSystem -- file:// = class org.apache.hadoop.fs.LocalFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.779 [main] DEBUG org.apache.hadoop.fs.FileSystem -- viewfs:// = class org.apache.hadoop.fs.viewfs.ViewFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.785 [main] DEBUG org.apache.hadoop.fs.FileSystem -- har:// = class org.apache.hadoop.fs.HarFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.791 [main] DEBUG org.apache.hadoop.fs.FileSystem -- http:// = class org.apache.hadoop.fs.http.HttpFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.795 [main] DEBUG org.apache.hadoop.fs.FileSystem -- https:// = class org.apache.hadoop.fs.http.HttpsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.834 [main] DEBUG org.apache.hadoop.fs.FileSystem -- hdfs:// = class org.apache.hadoop.hdfs.DistributedFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.868 [main] DEBUG org.apache.hadoop.fs.FileSystem -- webhdfs:// = class org.apache.hadoop.hdfs.web.WebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.875 [main] DEBUG org.apache.hadoop.fs.FileSystem -- swebhdfs:// = class org.apache.hadoop.hdfs.web.SWebHdfsFileSystem from /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.875 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking for FS supporting file
+17:10:24.875 [main] DEBUG org.apache.hadoop.fs.FileSystem -- looking for configuration option fs.file.impl
+17:10:24.904 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Looking in service filesystems for implementation class
+17:10:24.904 [main] DEBUG org.apache.hadoop.fs.FileSystem -- FS for file is class org.apache.hadoop.fs.LocalFileSystem
+17:10:24.904 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Jar location for class org.apache.hadoop.fs.LocalFileSystem : /usr/lib/ranger/ranger--usersync/lib/hadoop-client-api-3.4.2.jar
+17:10:24.929 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Checksum verification enabled=true
+17:10:24.930 [main] DEBUG org.apache.hadoop.fs.FileSystem -- Creating FS file:///etc/ranger/usersync/conf/rangerusersync.jceks: duration 0:00.215s
+17:10:25.685 [main] DEBUG org.apache.hadoop.fs.statistics.impl.IOStatisticsContextIntegration -- Created instance IOStatisticsContextImpl{id=1, threadId=1, ioStatistics=counters=();
+gauges=();
+minimums=();
+maximums=();
+means=();
+}
+The alias ranger.usersync.policymgr.password already exists!! Will try to delete first.
+FOUND value of [interactive] field in the Class [org.apache.hadoop.security.alias.CredentialShell] = [true]
+17:10:27.688 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+Deleting credential: ranger.usersync.policymgr.password from CredentialProvider: jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks
+Credential ranger.usersync.policymgr.password has been successfully deleted.
+17:10:27.875 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:10:28.009 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- backing jks path initialized to file:/etc/ranger/usersync/conf/rangerusersync.jceks
+WARNING: You have accepted the use of the default provider password
+by not configuring a password in one of the two following locations:
+    * In the environment variable HADOOP_CREDSTORE_PASSWORD
+    * In a file referred to by the configuration entry
+      hadoop.security.credstore.java-keystore-provider.password-file.
+Please review the documentation regarding provider passwords in
+the keystore passwords section of the Credential Provider API
+Continuing with the default provider password.
+
+17:10:28.150 [main] DEBUG org.apache.hadoop.security.alias.AbstractJavaKeyStoreProvider -- Writing out keystore.
+ranger.usersync.policymgr.password has been successfully created.
+Provider jceks://file/etc/ranger/usersync/conf/rangerusersync.jceks was updated.
+17:10:28.196 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.FilterFileSystem.close(FilterFileSystem.java:529)); Key: (root (auth:SIMPLE))@file://; URI: file:///; Object Identity Hash: 51ed6212
+17:10:28.203 [shutdown-hook-0] DEBUG org.apache.hadoop.fs.FileSystem -- FileSystem.close() by method: org.apache.hadoop.fs.RawLocalFileSystem.close(RawLocalFileSystem.java:960)); Key: null; URI: file:///; Object Identity Hash: 2f43f2ed
+17:10:28.213 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- Completed shutdown in 0.026 seconds; Timeouts: 0
+17:10:28.264 [Thread-2] DEBUG org.apache.hadoop.util.ShutdownHookManager -- ShutdownHookManager completed shutdown.
+getting values from file : /usr/lib/ranger/ranger--usersync/conf/ranger-ugsync-site.xml
+Direct Key not found:ranger_base_dir
+Direct Key not found:rangerUsersync_password
+Direct Key not found:hadoop_conf
+Direct Key not found:USERSYNC_PID_DIR_PATH
+Direct Key not found:SYNC_GROUP_USER_MAP_SYNC_ENABLED
+[I] ranger.usersync.ldap.ldapbindpassword property is verified.
+WARN: core-site.xml file not found in provided hadoop conf path...
+WARNING: Unix Authentication Program (/usr/lib/ranger/ranger--usersync/native/credValidator.uexe) is not available for setting chmod(4550), chown(root:ranger) 
+WARNING: Unix Authentication Program (/usr/lib/ranger/ranger--usersync/native/pamCredValidator.uexe) is not available for setting chmod(4550), chown(root:ranger) 
+Creating ranger-usersync-env-logdir.sh file
+Creating ranger-usersync-env-hadoopconfdir.sh file
+Creating ranger-usersync-env-piddir.sh file
+Creating ranger-usersync-env-confdir.sh file
+[I] Successfully updated password of rangerusersync user

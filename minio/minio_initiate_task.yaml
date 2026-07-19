@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: minio-bucket-init
+  name: minio-init
   namespace: minio
 spec:
   backoffLimit: 10

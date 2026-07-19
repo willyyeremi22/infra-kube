@@ -1,3 +1,0 @@
-NAME                              READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
-ranger-admin-6695874ffd-4wmt8     1/1     Running   0          22m   10.244.1.2   desktop-worker    <none>           <none>
-ranger-usersync-5948dfc7c-9s7rz   1/1     Running   0          22m   10.244.4.2   desktop-worker6   <none>           <none>

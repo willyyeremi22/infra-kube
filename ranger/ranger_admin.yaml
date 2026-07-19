@@ -38,7 +38,7 @@ data:
   authServiceHostName: ranger-usersync.ranger.svc.cluster.local
   authServicePort: "5151"
   authentication_method: LDAP
-  xa_ldap_url: ldap://lldap.lldap.svc.cluster.local:3890
+  xa_ldap_url: ldap://openldap.openldap.svc.cluster.local:389
   xa_ldap_userDNpattern: uid={0},ou=people,dc=example,dc=com
   xa_ldap_groupSearchBase: ou=groups,dc=example,dc=com
   xa_ldap_groupSearchFilter: (member={0})

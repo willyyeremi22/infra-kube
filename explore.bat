@@ -50,7 +50,7 @@ kubectl wait --for=condition=ready pod -l app=ranger-admin -n ranger --timeout=6
 @REM kubectl port-forward -n rdbms svc/postgres-ops 5431:5432
 @REM kubectl port-forward -n minio svc/minio 9001:9001
 @REM kubectl port-forward -n opensearch svc/opensearch-dashboard 5601:5601
-@REM kubectl port-forward -n lldap svc/lldap 17170:17170
+@REM kubectl port-forward -n openldap svc/phpldapadmin 80:80
 @REM kubectl port-forward -n airflow svc/airflow-api-server 8080:8080
 @REM kubectl port-forward -n ranger svc/ranger-admin 6080:6080
 
@@ -68,11 +68,42 @@ kubectl logs -n ranger deployment.apps/ranger-admin
 kubectl logs -n ranger deployment.apps/ranger-usersync
 
 
+kubectl exec deploy/ranger-usersync -n ranger -- tail -n 300 "/usr/lib/ranger/ranger--usersync/logs/usersync-ranger-usersync-5948dfc7c-4t2bt-.log" > usersync-real.log
+
+ldapsearch -x -H ldap://openldap.openldap.svc.cluster.local:389 -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "dc=example,dc=com"
+
+kubectl run ldaptest --rm -it --image=alpine --restart=Never -- sh -c "apk add openldap-clients ldapsearch -x -H ldap://lldap.lldap.svc.cluster.local:3890 -D 'uid=ranger_service,ou=people,dc=example,dc=com' -w password -b 'ou=people,dc=example,dc=com' '(objectClass=person)'"
 
 
-kubectl exec -it lldap-d8f66dbd6-fbhnf -n lldap -- sh
 
-kubectl exec -it deployment/ranger-usersync -n ranger -- cat /etc/ranger/usersync/conf/ranger-ugsync-site.xml
+
+
+ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "ou=groups,dc=example,dc=com" "(objectClass=groupOfNames)"
+
+ldapwhoami -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password
+
+ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "dc=example,dc=com"
+
+ldapsearch -Y EXTERNAL -H ldapi:/// -b "cn=config" "(olcSuffix=*)" olcSuffix
+
+ldapsearch -Y EXTERNAL -H ldapi:/// -b "olcDatabase={1}mdb,cn=config" olcAccess
+
+ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -s base -b "" namingContexts
+
+ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "uid=ranger_service,ou=people,dc=example,dc=com"
+
+ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "ou=groups,dc=example,dc=com"
+
+
+kubectl exec -it openldap-0 -n openldap -- sh
+
+kubectl exec -it ranger-usersync-5948dfc7c-4t2bt -n ranger -- sh
+
+kubectl exec -it -n ranger ranger-usersync-5948dfc7c-4t2bt -- grep -R "deltasync" /etc/ranger/usersync/conf
+
+kubectl exec -it -n ranger ranger-usersync-5948dfc7c-4t2bt -- grep -R "uSNChanged" /etc/ranger/usersync/conf
+
+kubectl exec -it deployment/ranger-usersync -n ranger -- ldapsearch
 
 kubectl exec -it deployment/ranger-usersync -n ranger -- grep -Ei "ldap|search|found|sync|user|group|person|objectclass|error|exception" /usr/lib/ranger/ranger--usersync/logs/*.log
 

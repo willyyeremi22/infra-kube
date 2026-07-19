@@ -1,0 +1,361 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openldap-secret
+  namespace: openldap
+type: Opaque
+stringData:
+  # Ganti nilai ini untuk lingkungan production
+  LDAP_ADMIN_PASSWORD: "Openldap!123"
+  LDAP_CONFIG_PASSWORD: "Openldap!123"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap-config
+  namespace: openldap
+data:
+  LDAP_ORGANISATION: "Example Inc"
+  LDAP_DOMAIN: "example.com"
+  LDAP_BASE_DN: "dc=example,dc=com"
+  LDAP_TLS: "false"
+  LDAP_READONLY_USER: "false"
+  LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap-init-data-1
+  namespace: openldap
+data:
+  01-ous.ldif: |
+    dn: ou=people,dc=example,dc=com
+    objectClass: organizationalUnit
+    ou: people
+
+    dn: ou=groups,dc=example,dc=com
+    objectClass: organizationalUnit
+    ou: groups
+
+  02-users.ldif: |
+    dn: uid=de1,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: de1
+    cn: Data Engineer 1
+    sn: Engineer1
+    mail: de1@example.com
+    userPassword: password
+
+    dn: uid=de2,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: de2
+    cn: Data Engineer 2
+    sn: Engineer2
+    mail: de2@example.com
+    userPassword: password
+
+    dn: uid=de3,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: de3
+    cn: Data Engineer 3
+    sn: Engineer3
+    mail: de3@example.com
+    userPassword: password
+
+    dn: uid=de4,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: de4
+    cn: Data Engineer Manager
+    sn: Manager
+    mail: de4@example.com
+    userPassword: password
+
+    dn: uid=da1,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: da1
+    cn: Data Analyst 1
+    sn: Analyst1
+    mail: da1@example.com
+    userPassword: password
+
+    dn: uid=da2,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: da2
+    cn: Data Analyst 2
+    sn: Analyst2
+    mail: da2@example.com
+    userPassword: password
+
+    dn: uid=da3,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: da3
+    cn: Data Analyst 3
+    sn: Analyst3
+    mail: da3@example.com
+    userPassword: password
+
+    dn: uid=da4,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: da4
+    cn: Data Analyst Manager
+    sn: Manager
+    mail: da4@example.com
+    userPassword: password
+
+    dn: uid=ranger_service,ou=people,dc=example,dc=com
+    objectClass: top
+    objectClass: person
+    objectClass: organizationalPerson
+    objectClass: inetOrgPerson
+    uid: ranger_service
+    cn: Ranger Service
+    sn: Service
+    mail: ranger_service@example.com
+    userPassword: password
+
+  03-groups.ldif: |
+    dn: cn=data_engineer,ou=groups,dc=example,dc=com
+    objectClass: top
+    objectClass: groupOfNames
+    cn: data_engineer
+    member: uid=de1,ou=people,dc=example,dc=com
+    member: uid=de2,ou=people,dc=example,dc=com
+    member: uid=de3,ou=people,dc=example,dc=com
+    member: uid=de4,ou=people,dc=example,dc=com
+
+    dn: cn=data_analyst,ou=groups,dc=example,dc=com
+    objectClass: top
+    objectClass: groupOfNames
+    cn: data_analyst
+    member: uid=da1,ou=people,dc=example,dc=com
+    member: uid=da2,ou=people,dc=example,dc=com
+    member: uid=da3,ou=people,dc=example,dc=com
+    member: uid=da4,ou=people,dc=example,dc=com
+
+    dn: cn=manager,ou=groups,dc=example,dc=com
+    objectClass: top
+    objectClass: groupOfNames
+    cn: manager
+    member: uid=de4,ou=people,dc=example,dc=com
+    member: uid=da4,ou=people,dc=example,dc=com
+
+    dn: cn=staff,ou=groups,dc=example,dc=com
+    objectClass: top
+    objectClass: groupOfNames
+    cn: staff
+    member: uid=de1,ou=people,dc=example,dc=com
+    member: uid=de2,ou=people,dc=example,dc=com
+    member: uid=de3,ou=people,dc=example,dc=com
+    member: uid=da1,ou=people,dc=example,dc=com
+    member: uid=da2,ou=people,dc=example,dc=com
+    member: uid=da3,ou=people,dc=example,dc=com
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap-init-data-2
+  namespace: openldap
+data:
+  02-security.ldif: |
+    dn: olcDatabase={1}{{ LDAP_BACKEND }},cn=config
+    changetype: modify
+
+    delete: olcAccess
+    -
+    add: olcAccess
+
+    olcAccess: to *
+      by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
+      by * break
+
+    olcAccess: to attrs=userPassword,shadowLastChange
+      by self write
+      by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+      by anonymous auth
+      by * none
+
+    olcAccess: to *
+      by dn.exact="uid=ranger_service,ou=people,{{ LDAP_BASE_DN }}" read
+      by self read
+      by dn="cn=admin,{{ LDAP_BASE_DN }}" write
+      by * none
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openldap
+  namespace: openldap
+spec:
+  serviceName: openldap-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openldap
+  volumeClaimTemplates:
+  - metadata:
+      name: openldap-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: "1Gi"
+  template:
+    metadata:
+      labels:
+        app: openldap
+    spec:
+      containers:
+      - name: openldap
+        image: osixia/openldap:stable
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - configMapRef:
+              name: openldap-config
+          - secretRef:
+              name: openldap-secret
+        args:
+          - --copy-service
+        ports:
+        - name: ldap
+          containerPort: 389
+        volumeMounts:
+        - name: openldap-init-data-1
+          mountPath: /container/service/slapd/assets/config/bootstrap/ldif/custom
+        - name: openldap-init-data-2
+          mountPath: /container/service/slapd/assets/config/bootstrap/ldif/02-security.ldif
+          subPath: 02-security.ldif
+        - name: openldap-pvc
+          mountPath: /var/lib/ldap
+        - name: openldap-pvc
+          mountPath: /etc/ldap/slapd.d
+        readinessProbe:
+          tcpSocket:
+            port: 389
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 389
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+      volumes:
+      - name: openldap-init-data-1
+        configMap:
+          name: openldap-init-data-1
+      - name: openldap-init-data-2
+        configMap:
+          name: openldap-init-data-2
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap
+  namespace: openldap
+spec:
+  selector:
+    app: openldap
+  ports:
+  - name: ldap
+    port: 389
+    targetPort: 389
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap-headless
+  namespace: openldap
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: openldap
+  ports:
+  - name: ldap
+    port: 389
+    targetPort: 389
+
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: phpldapadmin-config
+#   namespace: openldap
+# data:
+#   PHPLDAPADMIN_LDAP_HOSTS: "openldap.openldap.svc.cluster.local"
+#   PHPLDAPADMIN_HTTPS: "false"
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: phpldapadmin
+#   namespace: openldap
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: phpldapadmin
+#   template:
+#     metadata:
+#       labels:
+#         app: phpldapadmin
+#     spec:
+#       containers:
+#       - name: phpldapadmin
+#         image: osixia/phpldapadmin:stable
+#         imagePullPolicy: IfNotPresent
+#         envFrom:
+#           - configMapRef:
+#               name: phpldapadmin-config
+#         ports:
+#         - name: http
+#           containerPort: 80
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: phpldapadmin
+#   namespace: openldap
+# spec:
+#   selector:
+#     app: phpldapadmin
+#   ports:
+#   - name: http
+#     port: 80
+#     targetPort: 80

@@ -25,7 +25,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-metadata-initiate-command
+  name: postgres-metadata-init-command
   namespace: rdbms
 data:
   initiate_db.sh: |
@@ -101,7 +101,7 @@ spec:
         volumeMounts:
           - name: postgres-metadata-pvc
             mountPath: /var/lib/postgresql
-          - name: postgres-metadata-initiate-command
+          - name: postgres-metadata-init-command
             mountPath: /docker-entrypoint-initdb.d/initiate_db.sh
             subPath: initiate_db.sh
         readinessProbe:
@@ -115,9 +115,9 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
       volumes:
-        - name: postgres-metadata-initiate-command
+        - name: postgres-metadata-init-command
           configMap:
-            name: postgres-metadata-initiate-command
+            name: postgres-metadata-init-command
             defaultMode: 0755
 
 ---

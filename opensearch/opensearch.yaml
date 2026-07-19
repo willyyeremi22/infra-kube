@@ -479,9 +479,9 @@ spec:
 #     opensearch.shardTimeout: 30000
 #     server.maxPayloadBytes: 1048576
 #     opensearch_security.enabled: false
-#     data_source.enabled: true
-#     explore.enabled: true
-#     workspace.enabled: true
+##     data_source.enabled: true
+##     explore.enabled: true
+##     workspace.enabled: true
 
 # ---
 # apiVersion: apps/v1

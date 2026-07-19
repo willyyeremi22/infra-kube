@@ -1,26 +1,26 @@
-Name:             ranger-usersync-5948dfc7c-9s7rz
+Name:             ranger-usersync-5948dfc7c-cmt9h
 Namespace:        ranger
 Priority:         0
 Service Account:  default
-Node:             desktop-worker6/172.18.0.7
-Start Time:       Fri, 17 Jul 2026 13:37:40 +0700
+Node:             desktop-worker7/172.18.0.2
+Start Time:       Sun, 19 Jul 2026 00:07:26 +0700
 Labels:           app=ranger-usersync
                   pod-template-hash=5948dfc7c
 Annotations:      <none>
 Status:           Running
-IP:               10.244.4.2
+IP:               10.244.9.3
 IPs:
-  IP:           10.244.4.2
+  IP:           10.244.9.3
 Controlled By:  ReplicaSet/ranger-usersync-5948dfc7c
 Containers:
   ranger-usersync:
-    Container ID:   containerd://123ce57d5f9fd9b2d3874e42f1301c34a7563037821f7565c6d704562bffbdf5
+    Container ID:   containerd://152f4d33b1eb6b63bd868e0b05fe44324d28da9dc1f22d3df68f8ff8e669a641
     Image:          apache/ranger-custom-usersync:2.8.0
     Image ID:       docker.io/apache/ranger-custom-usersync@sha256:9f43b84892a67b6fbfe0cb07b7a55e5696bd4fc366ee70ee82dbcae3da524cef
     Port:           5151/TCP (http)
     Host Port:      0/TCP (http)
     State:          Running
-      Started:      Fri, 17 Jul 2026 13:37:58 +0700
+      Started:      Sun, 19 Jul 2026 00:09:22 +0700
     Ready:          True
     Restart Count:  0
     Environment Variables from:
@@ -28,7 +28,7 @@ Containers:
       ranger-secret-usersync  Secret     Optional: false
     Environment:              <none>
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-nspcz (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-rxd7g (ro)
 Conditions:
   Type                        Status
   PodReadyToStartContainers   True 
@@ -37,7 +37,7 @@ Conditions:
   ContainersReady             True 
   PodScheduled                True 
 Volumes:
-  kube-api-access-nspcz:
+  kube-api-access-rxd7g:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
@@ -50,8 +50,8 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type    Reason     Age   From               Message
   ----    ------     ----  ----               -------
-  Normal  Scheduled  22m   default-scheduler  Successfully assigned ranger/ranger-usersync-5948dfc7c-9s7rz to desktop-worker6
+  Normal  Scheduled  22m   default-scheduler  Successfully assigned ranger/ranger-usersync-5948dfc7c-cmt9h to desktop-worker7
   Normal  Pulling    22m   kubelet            spec.containers{ranger-usersync}: Pulling image "apache/ranger-custom-usersync:2.8.0"
-  Normal  Pulled     21m   kubelet            spec.containers{ranger-usersync}: Successfully pulled image "apache/ranger-custom-usersync:2.8.0" in 15.482s (15.482s including waiting). Image size: 370289031 bytes.
-  Normal  Created    21m   kubelet            spec.containers{ranger-usersync}: Container created
-  Normal  Started    21m   kubelet            spec.containers{ranger-usersync}: Container started
+  Normal  Pulled     20m   kubelet            spec.containers{ranger-usersync}: Successfully pulled image "apache/ranger-custom-usersync:2.8.0" in 1m50.93s (1m50.933s including waiting). Image size: 370289031 bytes.
+  Normal  Created    20m   kubelet            spec.containers{ranger-usersync}: Container created
+  Normal  Started    20m   kubelet            spec.containers{ranger-usersync}: Container started

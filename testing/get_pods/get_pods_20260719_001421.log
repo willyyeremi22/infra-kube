@@ -1,0 +1,2 @@
+NAME         READY   STATUS    RESTARTS      AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+openldap-0   1/1     Running   1 (15m ago)   15m   10.244.4.3   desktop-worker4   <none>           <none>
