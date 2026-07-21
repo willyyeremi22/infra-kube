@@ -4,9 +4,7 @@ metadata:
   name: airflow-config-api-server
   namespace: airflow
 data:
-  AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
-  AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: minio
-  AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: s3://airflow-logs
+  AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
 
 ---
 apiVersion: apps/v1
@@ -27,7 +25,7 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: api-server
-          image: apache/airflow:3.2.2-python3.14-fab-s3
+          image: apache/airflow:3.2.2-python3.14-s3-fab
           # imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -116,7 +114,7 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: scheduler
-          image: apache/airflow:3.2.2-python3.14-fab
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -208,7 +206,7 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: dag-processor
-          image: apache/airflow:3.2.2-python3.14-fab
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
           # imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -289,7 +287,7 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: triggerer
-          image: apache/airflow:3.2.2-python3.14-fab
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
           # imagePullPolicy: Never
           envFrom:
             - configMapRef:

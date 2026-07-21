@@ -1,5 +1,5 @@
-docker build -f ./airflow/dockerfile.airflow_fab_s3 --no-cache -t apache/airflow:3.2.2-python3.14-fab-s3 .
-docker build -f ./airflow/dockerfile.airflow_fab --no-cache -t apache/airflow:3.2.2-python3.14-fab .
+docker build -f ./airflow/dockerfile.airflow_s3_fab --no-cache -t apache/airflow:3.2.2-python3.14-s3-fab .
+docker build -f ./airflow/dockerfile.airflow_s3 --no-cache -t apache/airflow:3.2.2-python3.14-s3-k8s .
 docker build -f ./ranger/dockerfile.ranger_admin -t apache/ranger-custom-admin:2.8.0 . @REM 2 >&1 | Tee-Object -FilePath build.log
 docker build -f ./ranger/dockerfile.ranger_usersync --no-cache -t apache/ranger-custom-usersync:2.8.0 .
 

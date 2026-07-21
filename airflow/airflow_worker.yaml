@@ -4,9 +4,6 @@ metadata:
   name: airflow-config-worker
   namespace: airflow
 data:
-  AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
-  AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: minio
-  AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: s3://airflow-logs
   AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
 
 ---
@@ -27,7 +24,7 @@ data:
       restartPolicy: Never
       containers:
         - name: base
-          image: apache/airflow:3.2.2-python3.14-fab-s3
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
