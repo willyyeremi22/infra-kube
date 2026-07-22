@@ -14,12 +14,15 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: airflow-init
-          image: apache/airflow:3.2.2-python3.14-fab
+          image: apache/airflow:3.2.2-python3.14-s3-fab
           envFrom:
             - configMapRef:
                 name: airflow-config-common
             - secretRef:
                 name: airflow-secret
+          env:
+            - name: AIRFLOW__CORE__AUTH_MANAGER
+              value: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
           command:
             - /bin/bash
             - -c

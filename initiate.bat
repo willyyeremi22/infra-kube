@@ -5,17 +5,16 @@ kubectl apply -f namespace.yaml
 kubectl apply -f ./rdbms/postgresql-metadata.yaml -n rdbms
 kubectl wait --for=condition=ready pod -l app=postgres-metadata -n rdbms --timeout=60s
 
-kubectl apply -f ./opensearch/opensearch_secret.yaml -n opensearch
-kubectl apply -f ./opensearch/opensearch_configmap_common.yaml -n opensearch
-kubectl apply -f ./opensearch/opensearch.yaml -n opensearch
-kubectl wait --for=condition=ready pod -l app=opensearch-cluster-manager -n opensearch --timeout=60s
-kubectl apply -f ./opensearch/opensearch_initiate_task.yaml -n opensearch
-@REM kubectl logs -n opensearch job.batch/opensearch-init
+kubectl apply -f ./minio/minio.yaml -n minio
+kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
+kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
+@REM kubectl logs -n minio job/minio-bucket-init   
 
-kubectl apply -f ./openldap/openldap.yaml -n openldap
-timeout /T 60 /nobreak
-
-kubectl apply -f ./ranger/ranger_admin.yaml -n ranger
-kubectl wait --for=condition=ready pod -l app=ranger-admin -n ranger --timeout=60s
-timeout /T 60 /nobreak
-kubectl apply -f ./ranger/ranger_usersync.yaml -n ranger
+kubectl apply -f ./airflow/airflow_secret.yaml -n airflow
+kubectl apply -f ./airflow/airflow_rbac.yaml -n airflow
+kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow
+kubectl apply -f ./airflow/airflow_initiate_task.yaml -n airflow
+kubectl wait --for=condition=ready pod -l app=airflow-init -n airflow --timeout=60s
+@REM kubectl logs -n airflow job/airflow-init
+kubectl apply -f ./airflow/airflow_worker.yaml -n airflow
+kubectl apply -f ./airflow/airflow.yaml -n airflow

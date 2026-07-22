@@ -1,7 +1,7 @@
-docker build -f ./airflow/dockerfile.airflow_s3_fab --no-cache -t apache/airflow:3.2.2-python3.14-s3-fab .
-docker build -f ./airflow/dockerfile.airflow_s3 --no-cache -t apache/airflow:3.2.2-python3.14-s3-k8s .
+docker build -f ./airflow/dockerfile.airflow_s3_fab -t apache/airflow:3.2.2-python3.14-s3-fab .
+docker build -f ./airflow/dockerfile.airflow_s3_k8s -t apache/airflow:3.2.2-python3.14-s3-k8s .
 docker build -f ./ranger/dockerfile.ranger_admin -t apache/ranger-custom-admin:2.8.0 . @REM 2 >&1 | Tee-Object -FilePath build.log
-docker build -f ./ranger/dockerfile.ranger_usersync --no-cache -t apache/ranger-custom-usersync:2.8.0 .
+docker build -f ./ranger/dockerfile.ranger_usersync -t apache/ranger-custom-usersync:2.8.0 .
 
 kubectl apply -f namespace.yaml
 
@@ -16,6 +16,9 @@ kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
 kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
 @REM kubectl logs -n minio job/minio-bucket-init   
 
+kubectl apply -f ./openldap/openldap.yaml -n openldap
+timeout /T 60 /nobreak
+
 kubectl apply -f ./opensearch/opensearch_secret.yaml -n opensearch
 kubectl apply -f ./opensearch/opensearch_configmap_common.yaml -n opensearch
 kubectl apply -f ./opensearch/opensearch.yaml -n opensearch
@@ -25,23 +28,21 @@ kubectl apply -f ./opensearch/opensearch_initiate_task.yaml -n opensearch
 
 @REM tier 2
 
-kubectl apply -f ./lldap/lldap.yaml -n lldap
-kubectl wait --for=condition=ready pod -l app=lldap -n lldap --timeout=60s
-kubectl apply -f ./lldap/lldap_initiate_task.yaml -n lldap
-@REM kubectl logs -n lldap job.batch/lldap-init
-
-kubectl apply -f airflow_secret.yaml -n airflow
-kubectl apply -f airflow_rbac.yaml -n airflow
-kubectl apply -f airflow_configmap_common.yaml -n airflow
-kubectl apply -f airflow_initiate_task.yaml -n airflow
+kubectl apply -f ./airflow/airflow_secret.yaml -n airflow
+kubectl apply -f ./airflow/airflow_rbac.yaml -n airflow
+kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow
+kubectl apply -f ./airflow/airflow_initiate_task.yaml -n airflow
+kubectl wait --for=condition=ready pod -l app=airflow-init -n airflow --timeout=60s
 @REM kubectl logs -n airflow job/airflow-init
-kubectl apply -f airflow_worker.yaml -n airflow
-kubectl apply -f airflow.yaml -n airflow
+kubectl apply -f ./airflow/airflow_worker.yaml -n airflow
+kubectl apply -f ./airflow/airflow.yaml -n airflow
 
 @REM tier 3
 
-kubectl apply -f ./ranger/ranger.yaml -n ranger
+kubectl apply -f ./ranger/ranger_admin.yaml -n ranger
 kubectl wait --for=condition=ready pod -l app=ranger-admin -n ranger --timeout=60s
+timeout /T 60 /nobreak
+kubectl apply -f ./ranger/ranger_usersync.yaml -n ranger
 
 
 @REM ---

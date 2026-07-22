@@ -115,7 +115,7 @@ spec:
       containers:
         - name: scheduler
           image: apache/airflow:3.2.2-python3.14-s3-k8s
-          imagePullPolicy: Never
+          # imagePullPolicy: Never
           envFrom:
             - configMapRef:
                 name: airflow-config-common

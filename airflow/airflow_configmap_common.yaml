@@ -5,7 +5,7 @@ metadata:
   namespace: airflow
 data:
   AIRFLOW__CORE__EXECUTOR: KubernetesExecutor
-  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres.rdbms.svc.cluster.local:5432/airflow
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-metadata.rdbms.svc.cluster.local:5432/airflow
   AIRFLOW__CORE__LOAD_EXAMPLES: "False"
   AIRFLOW__API__BASE_URL: http://localhost:8080
   AIRFLOW__KUBERNETES_EXECUTOR__NAMESPACE: airflow
