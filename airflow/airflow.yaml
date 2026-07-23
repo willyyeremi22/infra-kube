@@ -218,7 +218,7 @@ spec:
                 name: airflow-secret
           volumeMounts:
             - name: dags
-              mountPath: /opt/airflow
+              mountPath: /opt/airflow/dags
               subPath: dags
               readOnly: true
           resources:
@@ -276,7 +276,7 @@ spec:
                 name: airflow-secret
           volumeMounts:
             - name: dags
-              mountPath: /opt/airflow
+              mountPath: /opt/airflow/dags
               subPath: dags
               readOnly: true
           resources:

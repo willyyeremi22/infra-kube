@@ -10,12 +10,12 @@
 @REM kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
 @REM @REM kubectl logs -n minio job/minio-bucket-init   
 
-kubectl apply -f ./airflow/airflow_gitsync.yaml -n airflow
-kubectl apply -f ./airflow/airflow_secret.yaml -n airflow
-kubectl apply -f ./airflow/airflow_rbac.yaml -n airflow
-kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow
-kubectl apply -f ./airflow/airflow_initiate_task.yaml -n airflow
-kubectl wait --for=condition=ready pod -l app=airflow-init -n airflow --timeout=60s
+kubectl delete -f ./airflow/airflow_gitsync.yaml -n airflow
+kubectl delete -f ./airflow/airflow_secret.yaml -n airflow
+kubectl delete -f ./airflow/airflow_rbac.yaml -n airflow
+kubectl delete -f ./airflow/airflow_configmap_common.yaml -n airflow
+kubectl delete -f ./airflow/airflow_initiate_task.yaml -n airflow
+@REM kubectl wait --for=condition=ready pod -l app=airflow-init -n airflow --timeout=60s
 @REM kubectl logs -n airflow job/airflow-init
-kubectl apply -f ./airflow/airflow_worker.yaml -n airflow
-kubectl apply -f ./airflow/airflow.yaml -n airflow
+kubectl delete -f ./airflow/airflow_worker.yaml -n airflow
+kubectl delete -f ./airflow/airflow.yaml -n airflow

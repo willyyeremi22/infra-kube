@@ -39,7 +39,7 @@ data:
                 name: airflow-secret
           volumeMounts:
             - name: dags
-              mountPath: /opt/airflow
+              mountPath: /opt/airflow/dags
               subPath: dags
               readOnly: true
       volumes:
