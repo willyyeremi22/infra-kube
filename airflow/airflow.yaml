@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,12 +35,19 @@ spec:
                 name: airflow-config-api-server
             - secretRef:
                 name: airflow-secret
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
           command:
             - airflow
           args:
             - api-server
-          ports:
-            - containerPort: 8080
           startupProbe:
             httpGet:
               path: /api/v2/version
@@ -63,13 +71,6 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 6
-          resources:
-            requests:
-              cpu: 500m
-              memory: 1Gi
-            limits:
-              cpu: "1"
-              memory: 2Gi
 
 ---
 apiVersion: v1
@@ -123,12 +124,22 @@ spec:
                 name: airflow-config-scheduler
             - secretRef:
                 name: airflow-secret
+          volumeMounts:
+            - name: pod-template
+              mountPath: /opt/airflow/pod_templates
+          ports:
+            - containerPort: 8974
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
           command:
             - airflow
           args:
             - scheduler
-          ports:
-            - containerPort: 8974
           startupProbe:
             exec:
               command:
@@ -149,20 +160,10 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 5
-          resources:
-            requests:
-              cpu: "500m"
-              memory: "1Gi"
-            limits:
-              cpu: "1"
-              memory: "2Gi"
-          volumeMounts:
-            - name: pod-template
-              mountPath: /opt/airflow/pod_templates
       volumes:
         - name: pod-template
           configMap:
-            name: airflow-worker-pod-template
+            name: airflow-worker-pod-template-1
 
 ---
 apiVersion: v1
@@ -218,11 +219,8 @@ spec:
           volumeMounts:
             - name: dags
               mountPath: /opt/airflow
+              subPath: dags
               readOnly: true
-          command:
-            - airflow
-          args:
-            - dag-processor
           resources:
             requests:
               cpu: 250m
@@ -230,11 +228,14 @@ spec:
             limits:
               cpu: "1"
               memory: 1Gi
+          command:
+            - airflow
+          args:
+            - dag-processor
       volumes:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-
 
 ---
 apiVersion: v1
@@ -276,11 +277,8 @@ spec:
           volumeMounts:
             - name: dags
               mountPath: /opt/airflow
+              subPath: dags
               readOnly: true
-          command:
-            - airflow
-          args:
-            - triggerer
           resources:
             requests:
               cpu: 250m
@@ -288,9 +286,11 @@ spec:
             limits:
               cpu: "1"
               memory: 1Gi
+          command:
+            - airflow
+          args:
+            - triggerer
       volumes:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-
-

@@ -1,5 +1,5 @@
-set NAMESPACE=ranger
-set POD=ranger-usersync-5948dfc7c-cmt9h
+set NAMESPACE=airflow
+set POD=airflow-dag-processor-6bfc7b9cc9-xhn6s
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set TIMESTAMP=%%i
 
