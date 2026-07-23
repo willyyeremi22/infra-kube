@@ -1,0 +1,67 @@
+# setup kubernetess on docker dekstop membolehkan banyak pod akses 1 pvc dengan accessModes ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-dags
+  namespace: airflow
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitsync-config
+  namespace: airflow
+data:
+  GIT_SYNC_REPO: "https://github.com/willyyeremi22/airflow-dag.git"
+  GIT_SYNC_BRANCH: "prod"
+  GIT_SYNC_ROOT: "/opt/airflow"
+  GIT_SYNC_DEST: "dags"
+  GIT_SYNC_PERIOD: "60s"
+  GIT_SYNC_ONE_TIME: "false"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsync
+  namespace: airflow
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gitsync
+  template:
+    metadata:
+      labels:
+        app: gitsync
+    spec:
+      containers:
+        - name: gitsync
+          image: registry.k8s.io/git-sync/git-sync:v4.3.0
+          envFrom:
+            - configMapRef:
+                name: gitsync-config
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags

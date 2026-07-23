@@ -23,7 +23,7 @@ data:
       serviceAccountName: airflow
       restartPolicy: Never
       containers:
-        - name: base
+        - name: airflow-worker
           image: apache/airflow:3.2.2-python3.14-s3-k8s
           imagePullPolicy: Never
           envFrom:
@@ -36,31 +36,8 @@ data:
           volumeMounts:
             - name: dags
               mountPath: /opt/airflow
-        - name: git-sync
-          image: registry.k8s.io/git-sync/git-sync:v4.3.0
-          env:
-            - name: GIT_SYNC_REPO
-              value: "https://github.com/willyyeremi22/airflow-dag.git"
-            - name: GIT_SYNC_BRANCH
-              value: "prod"
-            - name: GIT_SYNC_ROOT
-              value: "/opt/airflow"
-            - name: GIT_SYNC_DEST
-              value: "dags"
-            - name: GIT_SYNC_PERIOD
-              value: "60s"
-            - name: GIT_SYNC_ONE_TIME
-              value: "true"
-          volumeMounts:
-            - name: dags
-              mountPath: /opt/airflow 
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 256Mi
+              readOnly: true
       volumes:
         - name: dags
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: airflow-dags

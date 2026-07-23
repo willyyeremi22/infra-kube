@@ -215,6 +215,10 @@ spec:
                 name: airflow-config-dag-processor
             - secretRef:
                 name: airflow-secret
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+              readOnly: true
           command:
             - airflow
           args:
@@ -226,37 +230,10 @@ spec:
             limits:
               cpu: "1"
               memory: 1Gi
-          volumeMounts:
-            - name: dags
-              mountPath: /opt/airflow
-        - name: git-sync
-          image: registry.k8s.io/git-sync/git-sync:v4.3.0
-          env:
-            - name: GIT_SYNC_REPO
-              value: "https://github.com/willyyeremi22/airflow-dag.git"
-            - name: GIT_SYNC_BRANCH
-              value: "prod"
-            - name: GIT_SYNC_ROOT
-              value: "/opt/airflow"
-            - name: GIT_SYNC_DEST
-              value: "dags"
-            - name: GIT_SYNC_PERIOD
-              value: "60s"
-            - name: GIT_SYNC_ONE_TIME
-              value: "false"
-          volumeMounts:
-            - name: dags
-              mountPath: /opt/airflow
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 256Mi
       volumes:
         - name: dags
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: airflow-dags
 
 
 ---
@@ -296,13 +273,14 @@ spec:
                 name: airflow-config-triggerer
             - secretRef:
                 name: airflow-secret
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow
+              readOnly: true
           command:
             - airflow
           args:
             - triggerer
-          volumeMounts:
-            - name: dags
-              mountPath: /opt/airflow
           resources:
             requests:
               cpu: 250m
@@ -310,32 +288,9 @@ spec:
             limits:
               cpu: "1"
               memory: 1Gi
-        - name: git-sync
-          image: registry.k8s.io/git-sync/git-sync:v4.3.0
-          env:
-            - name: GIT_SYNC_REPO
-              value: "https://github.com/willyyeremi22/airflow-dag.git"
-            - name: GIT_SYNC_BRANCH
-              value: "prod"
-            - name: GIT_SYNC_ROOT
-              value: "/opt/airflow"
-            - name: GIT_SYNC_DEST
-              value: "dags"
-            - name: GIT_SYNC_PERIOD
-              value: "60s"
-            - name: GIT_SYNC_ONE_TIME
-              value: "false"
-          volumeMounts:
-            - name: dags
-              mountPath: /opt/airflow
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 256Mi
       volumes:
         - name: dags
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: airflow-dags
+
 

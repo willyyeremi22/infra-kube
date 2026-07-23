@@ -10,6 +10,7 @@ kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
 kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
 @REM kubectl logs -n minio job/minio-bucket-init   
 
+kubectl apply -f ./airflow/airflow_gitsync.yaml -n airflow
 kubectl apply -f ./airflow/airflow_secret.yaml -n airflow
 kubectl apply -f ./airflow/airflow_rbac.yaml -n airflow
 kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow

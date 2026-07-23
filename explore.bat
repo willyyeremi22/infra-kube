@@ -28,6 +28,7 @@ kubectl apply -f ./opensearch/opensearch_initiate_task.yaml -n opensearch
 
 @REM tier 2
 
+kubectl apply -f ./airflow/airflow_gitsync.yaml -n airflow
 kubectl apply -f ./airflow/airflow_secret.yaml -n airflow
 kubectl apply -f ./airflow/airflow_rbac.yaml -n airflow
 kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow
