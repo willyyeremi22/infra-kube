@@ -40,7 +40,6 @@ data:
           volumeMounts:
             - name: dags
               mountPath: /opt/airflow/dags
-              subPath: dags
               readOnly: true
       volumes:
         - name: dags

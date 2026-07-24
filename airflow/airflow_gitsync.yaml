@@ -24,7 +24,7 @@ data:
   GITSYNC_REF: "prod"
   GITSYNC_ROOT: "/opt/airflow"
   GITSYNC_LINK: "dags"
-  GITSYNC_PERIOD: "60s"
+  GITSYNC_PERIOD: "15s"
   GITSYNC_ONE_TIME: "false"
 
 ---

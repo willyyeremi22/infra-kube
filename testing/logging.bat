@@ -1,5 +1,5 @@
 set NAMESPACE=airflow
-set POD=airflow-dag-processor-6bfc7b9cc9-xhn6s
+set POD=airflow-dag-processor-db7745d96-dmq2c
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set TIMESTAMP=%%i
 
