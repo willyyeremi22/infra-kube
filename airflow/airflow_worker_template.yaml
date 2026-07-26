@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-worker-1
+  namespace: airflow
+data:
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config-worker-2
+  namespace: airflow
+data:
+  AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-worker-pod-templates
+  namespace: airflow
+data:
+  airflow_worker_1.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        component: airflow-worker
+    spec:
+      serviceAccountName: airflow
+      restartPolicy: Never
+      containers:
+        - name: base
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
+          # imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-worker-1
+            - secretRef:
+                name: airflow-secret
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow/dags
+              readOnly: true
+      volumes:
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags
+  airflow_worker_2.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        component: airflow-worker
+    spec:
+      serviceAccountName: airflow
+      restartPolicy: Never
+      containers:
+        - name: base
+          image: apache/airflow:3.2.2-python3.14-s3-k8s
+          # imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: airflow-config-common
+            - configMapRef:
+                name: airflow-config-worker-2
+            - secretRef:
+                name: airflow-secret
+          volumeMounts:
+            - name: dags
+              mountPath: /opt/airflow/dags
+              readOnly: true
+      volumes:
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags

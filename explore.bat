@@ -35,7 +35,7 @@ kubectl apply -f ./airflow/airflow_configmap_common.yaml -n airflow
 kubectl apply -f ./airflow/airflow_initiate_task.yaml -n airflow
 kubectl wait --for=condition=ready pod -l app=airflow-init -n airflow --timeout=60s
 @REM kubectl logs -n airflow job/airflow-init
-kubectl apply -f ./airflow/airflow_worker.yaml -n airflow
+kubectl apply -f ./airflow/airflow_worker_template.yaml -n airflow
 kubectl apply -f ./airflow/airflow.yaml -n airflow
 
 @REM tier 3

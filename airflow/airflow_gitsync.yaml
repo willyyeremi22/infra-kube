@@ -23,7 +23,7 @@ data:
   GITSYNC_REPO: "https://github.com/willyyeremi22/airflow-dag.git"
   GITSYNC_REF: "prod"
   GITSYNC_ROOT: "/git"
-  # GITSYNC_LINK: "/opt/airflow/dags"
+  GITSYNC_LINK: "/tmp/dags"
   GITSYNC_PERIOD: "15s"
   GITSYNC_ONE_TIME: "false"
 

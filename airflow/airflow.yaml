@@ -94,7 +94,7 @@ metadata:
   namespace: airflow
 data:
   AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
-  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: /opt/airflow/pod_templates/airflow_worker.yaml
+  AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE: /opt/airflow/pod_templates/airflow_worker_1.yaml
 
 ---
 apiVersion: apps/v1
@@ -125,7 +125,7 @@ spec:
             - secretRef:
                 name: airflow-secret
           volumeMounts:
-            - name: pod-template
+            - name: worker-pod-templates
               mountPath: /opt/airflow/pod_templates
           ports:
             - containerPort: 8974
@@ -161,9 +161,9 @@ spec:
             timeoutSeconds: 10
             failureThreshold: 5
       volumes:
-        - name: pod-template
+        - name: worker-pod-templates
           configMap:
-            name: airflow-worker-pod-template-1
+            name: airflow-worker-pod-templates
 
 ---
 apiVersion: v1
@@ -178,17 +178,6 @@ spec:
     - name: health
       port: 8974
       targetPort: 8974
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: airflow-config-airflowignore
-  namespace: airflow
-data:
-  .airflowignore: |
-    ^\.worktrees/
-    ^\.repo/
 
 ---
 apiVersion: v1
@@ -231,10 +220,6 @@ spec:
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: true
-            # - name: airflowignore
-            #   mountPath: /opt/airflow/dags/.airflowignore
-            #   subPath: .airflowignore
-            #   readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -250,9 +235,6 @@ spec:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-        # - name: airflowignore
-        #   configMap:
-        #     name: airflow-config-airflowignore
 
 ---
 apiVersion: v1
@@ -295,10 +277,6 @@ spec:
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: true
-            # - name: airflowignore
-            #   mountPath: /opt/airflow/dags/.airflowignore
-            #   subPath: .airflowignore
-            #   readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -314,6 +292,3 @@ spec:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-        # - name: airflowignore
-        #   configMap:
-        #     name: airflow-config-airflowignore
