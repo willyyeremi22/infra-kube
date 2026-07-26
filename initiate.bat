@@ -1,14 +1,14 @@
-@REM kubectl apply -f namespace.yaml
+kubectl apply -f namespace.yaml
 
-@REM @REM tier 1
+@REM tier 1
 
-@REM kubectl apply -f ./rdbms/postgresql-metadata.yaml -n rdbms
-@REM kubectl wait --for=condition=ready pod -l app=postgres-metadata -n rdbms --timeout=60s
+kubectl apply -f ./rdbms/postgresql-metadata.yaml -n rdbms
+kubectl wait --for=condition=ready pod -l app=postgres-metadata -n rdbms --timeout=60s
 
-@REM kubectl apply -f ./minio/minio.yaml -n minio
-@REM kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
-@REM kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
-@REM @REM kubectl logs -n minio job/minio-bucket-init   
+kubectl apply -f ./minio/minio.yaml -n minio
+kubectl wait --for=condition=ready pod -l app=minio -n minio --timeout=60s
+kubectl apply -f ./minio/minio_initiate_task.yaml -n minio
+@REM kubectl logs -n minio job/minio-bucket-init   
 
 kubectl apply -f ./airflow/airflow_gitsync.yaml -n airflow
 kubectl apply -f ./airflow/airflow_secret.yaml -n airflow

@@ -97,7 +97,8 @@ ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b
 ldapsearch -x -D "uid=ranger_service,ou=people,dc=example,dc=com" -w password -b "ou=groups,dc=example,dc=com"
 
 
-kubectl exec -it openldap-0 -n openldap -- sh
+kubectl exec -it deployments.app/gitsync -n airflow -- sh 
+kubectl exec -it deployments.app/airflow-dag-processor -n airflow -- sh 
 
 kubectl exec -it ranger-usersync-5948dfc7c-4t2bt -n ranger -- sh
 

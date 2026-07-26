@@ -194,7 +194,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: airflow-config-dag-processor-1
+  name: airflow-config-dag-processor
   namespace: airflow
 data:
   AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
@@ -231,10 +231,10 @@ spec:
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: true
-            - name: airflowignore
-              mountPath: /opt/airflow/dags/.airflowignore
-              subPath: .airflowignore
-              readOnly: true
+            # - name: airflowignore
+            #   mountPath: /opt/airflow/dags/.airflowignore
+            #   subPath: .airflowignore
+            #   readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -250,9 +250,9 @@ spec:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-        - name: airflowignore
-          configMap:
-            name: airflow-config-airflowignore
+        # - name: airflowignore
+        #   configMap:
+        #     name: airflow-config-airflowignore
 
 ---
 apiVersion: v1
@@ -295,10 +295,10 @@ spec:
             - name: dags
               mountPath: /opt/airflow/dags
               readOnly: true
-            - name: airflowignore
-              mountPath: /opt/airflow/dags/.airflowignore
-              subPath: .airflowignore
-              readOnly: true
+            # - name: airflowignore
+            #   mountPath: /opt/airflow/dags/.airflowignore
+            #   subPath: .airflowignore
+            #   readOnly: true
           resources:
             requests:
               cpu: 250m
@@ -314,6 +314,6 @@ spec:
         - name: dags
           persistentVolumeClaim:
             claimName: airflow-dags
-        - name: airflowignore
-          configMap:
-            name: airflow-config-airflowignore
+        # - name: airflowignore
+        #   configMap:
+        #     name: airflow-config-airflowignore
