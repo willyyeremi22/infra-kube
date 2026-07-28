@@ -45,6 +45,8 @@ kubectl wait --for=condition=ready pod -l app=ranger-admin -n ranger --timeout=6
 timeout /T 60 /nobreak
 kubectl apply -f ./ranger/ranger_usersync.yaml -n ranger
 
+./helm.exe install spark-kubernetes-operator spark-kubernetes-operator/spark-kubernetes-operator --version 1.8.0 -f ./spark/values.yaml -n spark
+
 
 @REM ---
 
