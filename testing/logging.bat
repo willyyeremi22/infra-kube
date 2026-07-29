@@ -1,5 +1,5 @@
 set NAMESPACE=airflow
-set POD=gitsync-59c7988b98-dzs7x
+set POD=gitsync-1-8f498f7f6-p5mgl
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set TIMESTAMP=%%i
 

@@ -17,12 +17,12 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gitsync-config
+  name: gitsync-config-1
   namespace: airflow
 data:
-  GITSYNC_REPO: "https://github.com/willyyeremi22/airflow-dag.git"
+  GITSYNC_REPO: "https://github.com/willyyeremi22/airflow-dag-1.git"
   GITSYNC_REF: "prod"
-  GITSYNC_ROOT: "/git"
+  GITSYNC_ROOT: "/git/airflow-dag-1"
   GITSYNC_LINK: "/tmp/dags"
   GITSYNC_PERIOD: "15s"
   GITSYNC_ONE_TIME: "false"
@@ -31,24 +31,75 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gitsync
+  name: gitsync-1
   namespace: airflow
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gitsync
+      app: gitsync-1
   template:
     metadata:
       labels:
-        app: gitsync
+        app: gitsync-1
     spec:
       containers:
-        - name: gitsync
+        - name: gitsync-1
           image: registry.k8s.io/git-sync/git-sync:v4.3.0
           envFrom:
             - configMapRef:
-                name: gitsync-config
+                name: gitsync-config-1
+          volumeMounts:
+            - name: dags
+              mountPath: /git
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitsync-config-2
+  namespace: airflow
+data:
+  GITSYNC_REPO: "https://github.com/willyyeremi22/airflow-dag-2.git"
+  GITSYNC_REF: "prod"
+  GITSYNC_ROOT: "/git/airflow-dag-2"
+  GITSYNC_LINK: "/tmp/dags"
+  GITSYNC_PERIOD: "15s"
+  GITSYNC_ONE_TIME: "false"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsync-2
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitsync-2
+  template:
+    metadata:
+      labels:
+        app: gitsync-2
+    spec:
+      containers:
+        - name: gitsync-2
+          image: registry.k8s.io/git-sync/git-sync:v4.3.0
+          envFrom:
+            - configMapRef:
+                name: gitsync-config-2
           volumeMounts:
             - name: dags
               mountPath: /git
