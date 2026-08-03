@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitsync-spark-repo
+  namespace: spark-jobs
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: gitsync-spark-repo}
+  template:
+    metadata:
+      labels: {app: gitsync-spark-repo}
+    spec:
+      securityContext:
+        fsGroup: 185          # samakan dengan group user image spark (apache/spark-py default UID 185)
+      containers:
+        - name: git-sync
+          image: registry.k8s.io/git-sync/git-sync:v4.2.1
+          args:
+            - --repo=https://github.com/org/spark-etl-repo.git
+            - --branch=main
+            - --root=/repo
+            - --link=current       # symlink atomic, penting!
+            - --period=30s
+          volumeMounts:
+            - name: repo
+              mountPath: /repo
+      volumes:
+        - name: repo
+          persistentVolumeClaim:
+            claimName: spark-repo-pvc
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spark-repo-pvc
+  namespace: spark-jobs
+spec:
+  accessModes: ["ReadWriteOnce"]   # cukup di Docker Desktop (single node)
+  resources:
+    requests:
+      storage: 1Gi

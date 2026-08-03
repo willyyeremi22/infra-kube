@@ -142,7 +142,7 @@ workloadResources:
   # Create namespace(s), service account(s), clusterrole, role(s) and rolebinding(s) for Spark
   # workloads, including SparkApps and SparkClusters
   namespaces:
-    create: true
+    create: false
     # When enabled, value for conf property `spark.operator.watched.namespaces` would be set to
     # the values provided in {workloadResources.namespaces.data} field as well
     overrideWatchedNamespaces: true
